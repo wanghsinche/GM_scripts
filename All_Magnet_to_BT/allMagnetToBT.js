@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         All Magnet to BT
-// @version      0.1.1
+// @version      0.1.2
 // @description  找出页面的磁力链，给出对应的种子下载地址//Find out all magnet links in current page and get their torrent download URLs. In theory, it supports many sites. you can add your favorites by //@include 
 // @author       wanghsinche @ 201509
 // @include      https://btdigg.org/search*
@@ -52,8 +52,8 @@ function getAllTorrents() {
 	listLen = codeList.length;
 	if (listLen !== 0) { //prase all magnet herf nodes into string
 		for (i = 0; i < listLen; i++) {
-			$(nodes[i]).after($(nodes[i]).clone().empty().html("[BT_2]").attr("title","download torrent from torcache" ).attr("href", code2down2(codeList[i])));
-			$(nodes[i]).after($(nodes[i]).clone().empty().html("[BT_1]").attr("title","download torrent from bt.box.n0808" ).attr("href", code2down1(codeList[i])));
+			$(nodes[i]).after($(nodes[i]).clone().empty().html("[BT_2]").attr("target","_blank").attr("title","download torrent from torcache" ).attr("href", code2down2(codeList[i])));
+			$(nodes[i]).after($(nodes[i]).clone().empty().html("[BT_1]").attr("target","_blank").attr("title","download torrent from bt.box.n0808" ).attr("href", code2down1(codeList[i])));
 		}
 	}
 }
