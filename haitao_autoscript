@@ -9,6 +9,7 @@
 // ==/UserScript==
 
 var timer;
+var timer2;
 
 function judgeHasOrder(){
 	if($('.all-list-tbody').children().length!==0){
@@ -23,10 +24,11 @@ function judgeHasOrder(){
 }
 function judgeSuccess(){
 	if($('.-order-release-anchor').length!==0){
+		$('label').trigger('click');
 		$('body').append('<iframe src="http://wxztest.sinaapp.com/tile-dharu-bola-13820.mp3" frameborder="0" id="alertIframe"></iframe>');
 	}
 	else{
-		timer=setTimeout(function(){judgeHasOrder();},5000);
+		setTimeout(function(){judgeHasOrder();},5000);
 	}
 }
 
