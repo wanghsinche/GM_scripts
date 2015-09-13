@@ -6,25 +6,28 @@
 // @include      http://buyers.youdao.com/list*
 // @include      http://buyers.youdao.com/lis*
 // @grant        none
+// @namespace https://greasyfork.org/users/326
 // ==/UserScript==
 
 var timer;
-
-
+var timer2;
 
 function judgeHasOrder(){
 	if($('.all-list-tbody').children().length!==0){
 		console.log('it should be click');
 			$(".-order-compete-button:last").trigger('click');//click last one 
+			//$(".-order-compete-button:first").trigger('click');//click first one 
 	}
 	else{
 		console.log("finding...");
-		timer=setTimeout(function(){judgeHasOrder();},2000);
+		timer=setTimeout(function(){judgeHasOrder();},500);
 	}
 }
 function judgeSuccess(){
 	if($('.-order-release-anchor').css('display')==='inline'){
-		$('body').append('<iframe src="http://wxztest.sinaapp.com/tile-dharu-bola-13820.mp3" frameborder="0" id="alertIframe"></iframe>');
+		$('label').trigger('click');
+		$('body').prepend("<div id='alart' style='background: yellow;'>好了</div>");
+		//$('body').append('<iframe src="http://wxztest.sinaapp.com/tile-dharu-bola-13820.mp3" frameborder="0" id="alertIframe"></iframe>');
 	}
 	else{
 		setTimeout(function(){judgeSuccess();},5000);
@@ -38,11 +41,3 @@ $('script[src="/script/list.js"]').after(wxzscript);
 $('label').trigger('click');
 judgeHasOrder();/* Act on the event */
 judgeSuccess();/* ring tone */
-
-
-
-
-
-
-
-
