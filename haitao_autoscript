@@ -28,7 +28,7 @@ function judgeSuccess(){
 		$('body').append('<iframe src="http://wxztest.sinaapp.com/tile-dharu-bola-13820.mp3" frameborder="0" id="alertIframe"></iframe>');
 	}
 	else{
-		setTimeout(function(){judgeHasOrder();},5000);
+		setTimeout(function(){judgeSuccess();},5000);
 	}
 }
 
