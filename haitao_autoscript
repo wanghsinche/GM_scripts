@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         haitao
-// @version      0.1
+// @version      0.1.1
 // @description  惠惠海淘自动脚本，使用时打开脚本就行，自动运行的。抢到单就自动停止，否则会一直抢。
 // @author       Wanghsinche
-// @match        http://buyers.youdao.com/list
-// @match        http://buyers.youdao.com/list?isJapanList=true
+// @include      http://buyers.youdao.com/list*
+// @include      http://buyers.youdao.com/lis*
 // @grant        none
 // ==/UserScript==
 
@@ -12,10 +12,8 @@ var timer;
 
 function judgeHasOrder(){
 	if($('.all-list-tbody').children().length!==0){
-		console.log('it should be clicked');
-		$.each($(".-order-compete-button"),function(i,e){
-			$(e).trigger('click');
-		});
+		console.log('it should be click');
+			$(".-order-compete-button:last").trigger('click');//click last one
 	}
 	else{
 		console.log("finding...");
