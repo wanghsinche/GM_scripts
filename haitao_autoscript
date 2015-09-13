@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         haitao
-// @version      0.1.1
+// @version      0.1.2
 // @description  惠惠海淘自动脚本，使用时打开脚本就行，自动运行的。抢到单就自动停止，否则会一直抢。
 // @author       Wanghsinche
 // @include      http://buyers.youdao.com/list*
@@ -13,19 +13,30 @@ var timer;
 function judgeHasOrder(){
 	if($('.all-list-tbody').children().length!==0){
 		console.log('it should be click');
-			$(".-order-compete-button:last").trigger('click');//click last one
+			$(".-order-compete-button:last").trigger('click');//click last one 
+			//$(".-order-compete-button:first").trigger('click');//click first one 
 	}
 	else{
 		console.log("finding...");
-		timer=setTimeout(function(){judgeHasOrder();},2000);
+		timer=setTimeout(function(){judgeHasOrder();},500);
 	}
 }
+function judgeSuccess(){
+	if($('.-order-release-anchor').length!==0){
+		$('body').append('<iframe src="http://wxztest.sinaapp.com/tile-dharu-bola-13820.mp3" frameborder="0" id="alertIframe"></iframe>');
+	}
+	else{
+		timer=setTimeout(function(){judgeHasOrder();},5000);
+	}
+}
+
 
 var wxzscript="<script type='text/javascript'>window.alert = function alert(msg) {console.log('Hidden Alert ' + msg);};</script>";
 $('script[src="/script/list.js"]').after(wxzscript);
 
 $('label').trigger('click');
 judgeHasOrder();/* Act on the event */
+judgeSuccess();/* ring tone */
 
 
 
