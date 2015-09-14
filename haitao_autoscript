@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         haitao
-// @version      0.1.4
+// @version      0.1.5
 // @description  惠惠海淘自动脚本，使用时打开脚本就行，自动运行的。抢到单就自动停止，否则会一直抢。保留一切版权。
 // @author       Wanghsinche 
 // @include      http://buyers.youdao.com/list*
@@ -12,7 +12,7 @@
 var timer;
 var success = false;
 var order=false;
-
+var showout=false;
 function judgeHasOrder() {
 	if ($('.all-list-tbody').children().length !== 0) {
 		console.log('it should be click');
@@ -34,6 +34,7 @@ function judgeSuccess() {
 		}
 	});
 	if (success) {
+		console.log('judgeSuccess success');
 		$('label').trigger('click');
 		$('body').prepend("<div id='alart' style='height:300px;text-align:center;background: yellow;'>好了</div>");
 		//$('body').append('<iframe src="http://wxztest.sinaapp.com/tile-dharu-bola-13820.mp3" frameborder="0" id="alertIframe"></iframe>');
@@ -46,6 +47,14 @@ function judgeSuccess() {
 
 function judgeShowOut(){
 	if ($('.lightRedText').length !== 0){
+		$.each($('.lightRedText'),function(i,e){
+			if($(e).text()==='错误！'){
+				showout=true;
+			}
+		});
+	}
+	if(showout){
+		console.log('judgeShowOut success');
 		setTimeout(function(){location.reload();},2000);
 	}
 	else{
@@ -59,8 +68,8 @@ var wxzscript = "<script type='text/javascript'>window.alert = function alert(ms
 $('script[src="/script/list.js"]').after(wxzscript);
 
 $('label').trigger('click');
-console.log('v0.1.4');
+console.log('v0.1.5');
+
 judgeSuccess(); /* ring tone */
 judgeShowOut();
 judgeHasOrder(); /* Act on the event */
-
