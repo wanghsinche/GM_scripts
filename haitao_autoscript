@@ -60,6 +60,7 @@ $('script[src="/script/list.js"]').after(wxzscript);
 
 $('label').trigger('click');
 console.log('v0.1.4');
-judgeHasOrder(); /* Act on the event */
 judgeSuccess(); /* ring tone */
 judgeShowOut();
+judgeHasOrder(); /* Act on the event */
+
