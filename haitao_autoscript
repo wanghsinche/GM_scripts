@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         haitao
-// @version      0.1.3
-// @description  惠惠海淘自动脚本，使用时打开脚本就行，自动运行的。抢到单就自动停止，否则会一直抢。
-// @author       Wanghsinche
+// @version      0.1.4
+// @description  惠惠海淘自动脚本，使用时打开脚本就行，自动运行的。抢到单就自动停止，否则会一直抢。保留一切版权。
+// @author       Wanghsinche 
 // @include      http://buyers.youdao.com/list*
 // @include      http://buyers.youdao.com/lis*
 // @grant        none
@@ -10,34 +10,56 @@
 // ==/UserScript==
 
 var timer;
-var timer2;
+var success = false;
+var order=false;
 
-function judgeHasOrder(){
-	if($('.all-list-tbody').children().length!==0){
+function judgeHasOrder() {
+	if ($('.all-list-tbody').children().length !== 0) {
 		console.log('it should be click');
-			$(".-order-compete-button:last").trigger('click');//click last one 
-			//$(".-order-compete-button:first").trigger('click');//click first one 
-	}
-	else{
+		order=true;
+		$(".-order-compete-button:last").trigger('click'); //click last one 
+		//$(".-order-compete-button:first").trigger('click');//click first one 
+	} else {
 		console.log("finding...");
-		timer=setTimeout(function(){judgeHasOrder();},500);
+		timer = setTimeout(function() {
+			judgeHasOrder();
+		}, 500);
 	}
 }
-function judgeSuccess(){
-	if($('.-order-release-anchor').css('display')==='inline'){
+
+function judgeSuccess() {
+	$.each($('.-order-release-anchor'), function(i, e) {
+		if ($(e).css('display') === 'inline') {
+			success = false;
+		}
+	});
+	if (success) {
 		$('label').trigger('click');
-		$('body').prepend("<div id='alart' style='background: yellow;'>好了</div>");
+		$('body').prepend("<div id='alart' style='height:300px text-align:center background: yellow;'>好了</div>");
 		//$('body').append('<iframe src="http://wxztest.sinaapp.com/tile-dharu-bola-13820.mp3" frameborder="0" id="alertIframe"></iframe>');
+	} else {
+		setTimeout(function() {
+			judgeSuccess();
+		}, 5000);
+	}
+}
+
+function judgeShowOut(){
+	if ($('.lightRedText').length !== 0){
+		setTimeout(function(){location.reload();},2000);
 	}
 	else{
-		setTimeout(function(){judgeSuccess();},5000);
+		setTimeout(function(){
+			judgeShowOut();
+		},2000);
 	}
 }
 
-
-var wxzscript="<script type='text/javascript'>window.alert = function alert(msg) {console.log('Hidden Alert ' + msg);};</script>";
+var wxzscript = "<script type='text/javascript'>window.alert = function alert(msg) {console.log('Hidden Alert ' + msg);};</script>";
 $('script[src="/script/list.js"]').after(wxzscript);
 
 $('label').trigger('click');
-judgeHasOrder();/* Act on the event */
-judgeSuccess();/* ring tone */
+console.log('v0.1.4');
+judgeHasOrder(); /* Act on the event */
+judgeSuccess(); /* ring tone */
+judgeShowOut();
