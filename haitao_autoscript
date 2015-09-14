@@ -30,7 +30,7 @@ function judgeHasOrder() {
 function judgeSuccess() {
 	$.each($('.-order-release-anchor'), function(i, e) {
 		if ($(e).css('display') === 'inline') {
-			success = false;
+			success = true;
 		}
 	});
 	if (success) {
