@@ -35,7 +35,7 @@ function judgeSuccess() {
 	});
 	if (success) {
 		$('label').trigger('click');
-		$('body').prepend("<div id='alart' style='height:300px text-align:center background: yellow;'>好了</div>");
+		$('body').prepend("<div id='alart' style='height:300px;text-align:center;background: yellow;'>好了</div>");
 		//$('body').append('<iframe src="http://wxztest.sinaapp.com/tile-dharu-bola-13820.mp3" frameborder="0" id="alertIframe"></iframe>');
 	} else {
 		setTimeout(function() {
