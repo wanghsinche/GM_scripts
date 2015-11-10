@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         All Magnet to BT
-// @version      0.1.4
+// @version      0.1.4.1
 // @description  找出页面的磁力链，给出对应的种子下载地址//Find out all magnet links in current page and get their torrent download URLs. In theory, it supports many sites. you can add your favorites by //@include 
 // @author       wanghsinche @ 201509
 // @include      https://btdigg.org/search*
 // @include      http://btdigg.org/search*
 // @include      http://*.jav*.*
 // @include      https://*.jav*.*
-// @include      http://www.torrentkitty.org/search*
-// @require      http://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js
+// @include      http://www.torrentkitty.*/search*
+// @require      http://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js
 // @run-at      document-end
 // @namespace https://greasyfork.org/users/326
 // ==/UserScript==
@@ -111,9 +111,3 @@ var t=window.setInterval(function() { //wait 2 seconds to execute getAllTorrents
         i++;
     }
 }, 500);
-
-
-
-
-
-
