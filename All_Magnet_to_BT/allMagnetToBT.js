@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         All Magnet to BT
-// @version      0.1.4.1
+// @version      0.1.4.2
 // @description  找出页面的磁力链，给出对应的种子下载地址//Find out all magnet links in current page and get their torrent download URLs. In theory, it supports many sites. you can add your favorites by //@include 
 // @author       wanghsinche @ 201509
 // @include      https://btdigg.org/search*
@@ -58,7 +58,7 @@ function include(Things,obj) {
 }
 
 function setCss(){
-    $('head').append('<style>.color1{background-color:#FFEB3B}.color2{background-color:#F44336}.color3{background-color:#4CAF50}a.wxz-a{    display: inline-block;margin-left:5px;height: 20px;width: 20px;background-size: 20px;border-radius: 50%;background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAB/UlEQVRIS6WUDVEDQQyFWwVQBRQFFAetAkABRQGggFYBOKAoABRwDgAFFAWAA953s+nkMtn+wM5kus0leXn52X5vu7MvsyPJSML9W/ImeS/3tVH6GzCm+n5ZgtdMAbuTPNQMaiBk/CgZbke0tVpKzgrDjlsGQvb3OwSPphdSLLwygvwXwGJ3gDwIJXr9B4Poemyl8yDU9GAHkOcShMZTnr3gix6gnoH8pUyHpdnEmUlukgTbshkIqOwBh9kns6ZkyngyxvHMS3D07M5XYtOyASQaMO8wszPU5SMJwEIOnJ7EzhO7ASBjyYv7GJ355Jn6OH6KaslMALmS3IYM4qzDLNudVXOLf8bmGpCZJDatkW7igCnpUhInCJPVqOqesZnXmODsp4f/WZbo/QDwH9aIPaotk7HE98QIRGecYGhTiN2PhCWGZTwzKahQ25Pa+OEIG3+wJUsSsyXE7rQYPTlj7ieSdro4temhL02SZQRmxK1vgHKHITs32rTxcWciHgyYzGElkc7GY0MG8e1iZygZv5x1UxZxWhYot3mF487UnpkIkr7CGE0lceka6fzOUJrsmfEgncQ8EzPKgOLO2ORkrYjMO+XyDtSSQNYj2CwkS8lnYRxfCXpAgkxq52RMvAFOvG1+AWMMgtMnkkjPJhBzsrmHIXemjYwRm7waRu8XzEByGl4Ir08AAAAASUVORK5CYII=");vertical-align: middle;}</style>');
+    $('head').append('<style>.color1{background-color:#FFEB3B}.color2{background-color:#F44336}.color3{background-color:#4CAF50}a.wxz-a{ background-repeat: no-repeat;background-position: center;    display: inline-block;margin-left:5px;height: 20px;width: 20px;background-size: 20px;border-radius: 50%;background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAB/UlEQVRIS6WUDVEDQQyFWwVQBRQFFAetAkABRQGggFYBOKAoABRwDgAFFAWAA953s+nkMtn+wM5kus0leXn52X5vu7MvsyPJSML9W/ImeS/3tVH6GzCm+n5ZgtdMAbuTPNQMaiBk/CgZbke0tVpKzgrDjlsGQvb3OwSPphdSLLwygvwXwGJ3gDwIJXr9B4Poemyl8yDU9GAHkOcShMZTnr3gix6gnoH8pUyHpdnEmUlukgTbshkIqOwBh9kns6ZkyngyxvHMS3D07M5XYtOyASQaMO8wszPU5SMJwEIOnJ7EzhO7ASBjyYv7GJ355Jn6OH6KaslMALmS3IYM4qzDLNudVXOLf8bmGpCZJDatkW7igCnpUhInCJPVqOqesZnXmODsp4f/WZbo/QDwH9aIPaotk7HE98QIRGecYGhTiN2PhCWGZTwzKahQ25Pa+OEIG3+wJUsSsyXE7rQYPTlj7ieSdro4temhL02SZQRmxK1vgHKHITs32rTxcWciHgyYzGElkc7GY0MG8e1iZygZv5x1UxZxWhYot3mF487UnpkIkr7CGE0lceka6fzOUJrsmfEgncQ8EzPKgOLO2ORkrYjMO+XyDtSSQNYj2CwkS8lnYRxfCXpAgkxq52RMvAFOvG1+AWMMgtMnkkjPJhBzsrmHIXemjYwRm7waRu8XzEByGl4Ir08AAAAASUVORK5CYII=");vertical-align: middle;}</style>');
 }
 
 function getAllTorrentsNew() {
