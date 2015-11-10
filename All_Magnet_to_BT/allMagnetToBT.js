@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         All Magnet to BT
-// @version      0.1.3
+// @version      0.1.4
 // @description  找出页面的磁力链，给出对应的种子下载地址//Find out all magnet links in current page and get their torrent download URLs. In theory, it supports many sites. you can add your favorites by //@include 
 // @author       wanghsinche @ 201509
 // @include      https://btdigg.org/search*
@@ -57,12 +57,15 @@ function include(Things,obj) {
 	};
 }
 
+function setCss(){
+    $('head').append('<style>.color1{background-color:#FFEB3B}.color2{background-color:#F44336}.color3{background-color:#4CAF50}a.wxz-a{    display: inline-block;margin-left:5px;height: 20px;width: 20px;background-size: 20px;border-radius: 50%;background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAB/UlEQVRIS6WUDVEDQQyFWwVQBRQFFAetAkABRQGggFYBOKAoABRwDgAFFAWAA953s+nkMtn+wM5kus0leXn52X5vu7MvsyPJSML9W/ImeS/3tVH6GzCm+n5ZgtdMAbuTPNQMaiBk/CgZbke0tVpKzgrDjlsGQvb3OwSPphdSLLwygvwXwGJ3gDwIJXr9B4Poemyl8yDU9GAHkOcShMZTnr3gix6gnoH8pUyHpdnEmUlukgTbshkIqOwBh9kns6ZkyngyxvHMS3D07M5XYtOyASQaMO8wszPU5SMJwEIOnJ7EzhO7ASBjyYv7GJ355Jn6OH6KaslMALmS3IYM4qzDLNudVXOLf8bmGpCZJDatkW7igCnpUhInCJPVqOqesZnXmODsp4f/WZbo/QDwH9aIPaotk7HE98QIRGecYGhTiN2PhCWGZTwzKahQ25Pa+OEIG3+wJUsSsyXE7rQYPTlj7ieSdro4temhL02SZQRmxK1vgHKHITs32rTxcWciHgyYzGElkc7GY0MG8e1iZygZv5x1UxZxWhYot3mF487UnpkIkr7CGE0lceka6fzOUJrsmfEgncQ8EzPKgOLO2ORkrYjMO+XyDtSSQNYj2CwkS8lnYRxfCXpAgkxq52RMvAFOvG1+AWMMgtMnkkjPJhBzsrmHIXemjYwRm7waRu8XzEByGl4Ir08AAAAASUVORK5CYII=");vertical-align: middle;}</style>');
+}
+
 function getAllTorrentsNew() {
 	var rawnodes = $('a[href^="magnet"]').get();
 	var nodes = [];
 	var codeList = [];
 	var listLen = 0;
-	var i = 0;
 	for (var i = 0; i <rawnodes.length; i++) {
 		if(!include(nodes,rawnodes[i])){
 			nodes.push(rawnodes[i]);
@@ -70,12 +73,18 @@ function getAllTorrentsNew() {
 	};
 	codeList = getAllMagnet(nodes);
 	listLen = codeList.length;
+    setCss();
+   
 	if (listLen !== 0) { //prase all magnet herf nodes into string
-		for (i = 0; i < listLen; i++) {
-            $(nodes[i]).after($(nodes[i]).clone().empty().html(" <img height='16px' width='16px' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGYAAABmCAMAAAAOARRQAAAAYFBMVEUzMzP///8vLy/Z2dkaGhpWVlYsLCy3t7e/v7/s7Ow9PT26urpBQUEqKio4ODgnJydGRkb19fV1dXVvb28gICCKiorFxcVpaWkSEhLh4eHy8vJTU1Orq6uioqKQkJCqqqpDyRVnAAACRklEQVRoge2ay5KCMBBFk0YiGAgvQWfU8f//cqSUhyNqOsRbs+CuXGBOpW8CSXcLOVIRN3UVJmKmkrCqm7gYjyyGn7EuzTZVNJciBKl0a0odT2F0pdL5hEGpqvQDptgZ5RPSSpldcY8J8sw3pFWWB2NMk3ufylUqbwZM8ClKywk6TPE5SsspbpjdR3zplO2uGG1Yf6PNhre1jG4xccUKGQmtBYujqviC0VzKZf5MjpaiKDl7n5KoXThRwuGkZSFijjNE0XW7RcThmFg0WwZFrLuX1JoTt20javuYkRnehZf1ac9Ja2G/zm6+dGL4oyoR2j7c+9JzrP2hUNh+K0e+8P2x/iDf+eLijx0liR4p3P3znvLXF74/VpQHX3p//HFoM+FL7w/zff2cMu2LZ3+e+uLVnxe+ePTnpS/e/KHNm4jd4jaP89aXnjMnbha+dJrhj2XEZsaNRXHmEFmssbG0W9ysfem0doCkRy5FyjP/lMwNWasjH6N+2JTv0uFmYU5cSu20BBTlh/Cm/Gt66K+8e+KQKNdbEvXaB9OYYD884wgZa/UMs/Iw+IJZMAtmwSyYBbNg/ikGcuRQKuEcoHJyOkBR/T099FOdeCng61xKLkXKH/58Mocbgeb7k535mKNLAQhyjYJdCjFXXNSFHZV+QCVTUKkhVKILlbZDJSFRKVVUghiV7kYl71GliPmFFVCZCFT0ApXwQAVJUHkVVCwGlb5BhXxUWwKoyQLVMoJqgAG186Cak1CtVqjGMQlqg5Oopj75yRbFX9LXIf9Djz2fAAAAAElFTkSuQmCC'>").attr("target","_blank").attr("title","download torrent from torcache" ).attr("href", code2down3(codeList[i])));
+		for (var i = 0; i < listLen; i++) {
+            $(nodes[i]).after($(nodes[i]).clone().addClass('wxz-a color3').empty().attr("target","_blank").attr("title","download torrent from torrent.org" ).attr("href", code2down3(codeList[i])));
+			$(nodes[i]).after($(nodes[i]).clone().addClass('wxz-a color1').empty().attr("target","_blank").attr("title","download torrent from bt.box" ).attr("href", code2down1(codeList[i])));
+			$(nodes[i]).after($(nodes[i]).clone().addClass('wxz-a color2').empty().attr("target","_blank").attr("title","download torrent from torcache" ).attr("href", code2down2(codeList[i])));
 		}
 	}
+     $('.wxz-a').css('b','d');
 }
+
 
 function getAllTorrents() {
 	var nodes = $('a[href^="magnet"]');
@@ -91,10 +100,20 @@ function getAllTorrents() {
 	}
 }
 
-$(window).load(function(){
-window.setTimeout(function() { //wait 2 seconds to execute getAllTorrents() function
-	getAllTorrentsNew();
-}, 2000);
-});
+var i=0
+
+
+var t=window.setInterval(function() { //wait 2 seconds to execute getAllTorrents() function
+    if($('a[href^="magnet"]').length>0||i>20){
+        window.clearInterval(t);
+        getAllTorrentsNew();
+    }else{
+        i++;
+    }
+}, 500);
+
+
+
+
 
 
