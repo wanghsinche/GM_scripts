@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       百度云插件+APIKey
 // @namespace  
-// @version    4.4.3.4 beta
+// @version    4.4.4.0 beta
 // @description  在百度云网盘的页面添加一个搜索框，调用搜索API搜索所有公开分享文件// To add a search frame that calls some api for searching some public shared files in BaiduYun cloud netdisk. 
 // @require        http://code.jquery.com/jquery-2.1.1.min.js
 // @description  For more imformation,please email me at wang0xinzhe@gmail.com. 
@@ -67,7 +67,7 @@
 var SearchObject = function($, replaceEle) {
     var keyword = '',
         flag = '',
-        info = 'Created by Wang Hsin-che @ 2014 04. The current version is 4.4.3.4';
+        info = 'Created by Wang Hsin-che @ 2014 04. The current version is 4.4.4.0';
 
     function searchClear() {
         $('#wxz_myDiv').slideUp();
@@ -85,11 +85,15 @@ var SearchObject = function($, replaceEle) {
         }
         console.log('search');
         switch (flag) {
+            case 'Bing': 
+                url = 'http://cn.bing.com/search?q=';//http://cn.bing.com/search?q=rk3368+site:pan.baidu.com;ie=utf-8 
+                url = url + keyword + '+site%3Apan.baidu.com' + '&first=' + startIndex;
+                break;
             case 'repigu':
                 url = 'https://repigu.com/uds/GwebSearch?rsz=filtered_cse&hl=zh_CN&cx=018177143380893153305:yk0qpgydx_e&v=1.0&amp;key=AIzaSyCVAXiUzRYsML1Pv6RwSG1gunmMikTzQqY&q=';
                 url = url + keyword + '&start=' + startIndex;
                 break;
-        case 'Repigu':
+            case 'Repigu':
                 url = 'https://repigu.com/search?q=';
                 url = url + keyword + '+site:pan.baidu.com'+'&start=' + startIndex;
                 break;
@@ -125,6 +129,9 @@ var SearchObject = function($, replaceEle) {
                 switch (flag) {
                     case 'Google':
                         data = JSON.parse(response.responseText);
+                        break;
+                    case 'Bing': 
+                        data = bingToData(response.responseText);
                         break;
                     case 'repigu':
                         data = mirrorToData(response.responseText);
@@ -176,6 +183,48 @@ var SearchObject = function($, replaceEle) {
         var temp = '<p align="right"><a href="javascript:alert(' + "'" + info + "'" + ')" ><font color="#333">About me</font></a></p>';
         $('.wxz-content').append(temp);
     }
+    function bingToData(html) { 
+    var data = { cursor: { estimatedResultCount: 0, resultCount: 0 }, results: [] };
+    //其中一条结果：
+    //<li class="b_algo"><h2>
+    //<a href="http://pan.baidu.com/wap/link?uk=2923110658&amp;shareid=3468815834&amp;third=3" target="_blank" h="ID=SERP,5101.1">YFK-<strong>RK3368</strong>-8189-20150821.rar_免费高速下载|百度云 网盘 ...</a></h2>
+    //<div class="b_caption"><p>文件名:YFK-<strong>RK3368</strong>-8189-20150821.rar 文件大小:497.55M 分享者:晨芯FAE 分享时间:2015-8-21 14:07 下载次数:5 ... 登录百度云客户端送2T空间 电脑版</p>
+    //<div class="b_attribution" u="0|5058|4835271386991248|8OMhcGIIj8GW08I41R5UoSyJpl2_5Pny"><cite><strong>pan.baidu.com</strong>/wap/link?uk=2923110658&amp;shareid=3468815834&amp;...</cite><span class="c_tlbxTrg">
+    //<span class="c_tlbxH" H="BASE:CACHEDPAGEDEFAULT" K="SERP,5102.1"></span></span></div></div></li>
+    //http://www.jb51.net/article/49083.htm在JS中解析HTML字符串示例代码：
+    var el = $( '<div></div>' ); 
+    el.html(html); 
+    var b_results = $("#b_results", el);
+    var b_algo_Arry = $("li.b_algo", b_results);
+    $.each(b_algo_Arry, function(index, val) {
+        var tempResult = {
+            unescapedUrl: "",
+            titleNoFormatting: "",
+            contentNoFormatting: ""
+        };
+        tempResult.unescapedUrl = $(val).find("h2 a").attr('href');
+        tempResult.titleNoFormatting = $(val).find("h2 a").text();
+        tempResult.contentNoFormatting = $(val).find('div.b_caption p').text();
+        data.results.push(tempResult);
+    });
+    ////处理统计结果
+    var rawResultCount=$('.sb_count',b_results).text();
+    var matchLst=[];    
+    matchLst=rawResultCount.match(/([0-9]{1,3}(,[0-9]{3})+)/g);
+    if(matchLst!==null){//匹配100,000,111之类的情况
+        data.cursor.resultCount=matchLst[0].replace(',','');
+    }else{
+        matchLst=rawResultCount.match(/\d+/g);
+        if(matchLst!==null){//匹配10 个结果之类的情况，以及1-11，共11个的情况
+        data.cursor.resultCount=matchLst.pop();
+        }else{//匹配无的情况
+        data.cursor.resultCount=0;
+        }
+    }
+    data.cursor.resultCount = parseInt( data.cursor.resultCount.toString(),10);
+    data.cursor.estimatedResultCount = data.cursor.resultCount;
+    return data;
+}
     function mirrorToData(text){
         var tempData=JSON.parse(text).responseData;
         var data = {
@@ -355,6 +404,9 @@ var SearchObject = function($, replaceEle) {
                         <span node-type="click-ele" data-key="SOSO" class="li wxz-menu-option">\
                             <a >by SOSO</a>\
                         </span>\
+                        <span node-type="click-ele" data-key="Bing" class="li wxz-menu-option">\
+                            <a >by Bing</a>\
+                        </span>\
                         <span node-type="click-ele" data-key="Google" class="li wxz-menu-option">\
                             <a >by Google</a>\
                         </span>\
@@ -445,4 +497,4 @@ var SearchObject = function($, replaceEle) {
 var ele = (window.innerWidth > 1024 ? '#top_menu_other' : 'div.remaining');
 
 //启动
-SearchObject(jQuery, ele).init('SOSO'); //to use original google, please replace parameter with 'Google';
+SearchObject(jQuery, ele).init('Bing'); //to use original google, please replace parameter with 'Google';
