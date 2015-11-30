@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         All Magnet to BT
-// @version      0.1.4.2
+// @version      0.1.4.3
 // @description  找出页面的磁力链，给出对应的种子下载地址//Find out all magnet links in current page and get their torrent download URLs. In theory, it supports many sites. you can add your favorites by //@include 
 // @author       wanghsinche @ 201509
 // @include      https://btdigg.org/search*
