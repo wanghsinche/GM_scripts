@@ -45,7 +45,7 @@ function code2down2(str) {
 function code2down3(str) {
 	var btih, torrentURL;
 	btih = str.toLocaleUpperCase();
-	torrentURL = "http://www.torrent.org.cn/Home/Torrent/download?hash=" + btih;
+	torrentURL = "http://www.torrent.org.cn/Home/Torrent/download.html?hash=" + btih;
 	return torrentURL;
 }
 
