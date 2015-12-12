@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       百度云插件+APIKey
 // @namespace  
-// @version    4.4.4.0 beta
+// @version    4.4.4.1 beta
 // @description  在百度云网盘的页面添加一个搜索框，调用搜索API搜索所有公开分享文件// To add a search frame that calls some api for searching some public shared files in BaiduYun cloud netdisk. 
 // @require        http://code.jquery.com/jquery-2.1.1.min.js
 // @description  For more imformation,please email me at wang0xinzhe@gmail.com. 
@@ -67,7 +67,7 @@
 var SearchObject = function($, replaceEle) {
     var keyword = '',
         flag = '',
-        info = 'Created by Wang Hsin-che @ 2014 04. The current version is 4.4.4.0';
+        info = 'Created by Wang Hsin-che @ 2014 04. The current version is 4.4.4.1';
 
     function searchClear() {
         $('#wxz_myDiv').slideUp();
@@ -425,7 +425,7 @@ var SearchObject = function($, replaceEle) {
     </style>\
                     ';
         switch (replaceEle) {
-            case '#top_menu_other':
+            case '#ad-header-tips':
                 $('div.info.clearfix ul').prepend(html_1);//切换按钮
                 $(replaceEle).remove(); //删除搜索栏了广告
     //          $('div.info.clearfix ul').prepend(html_1);//搜索按钮
@@ -494,7 +494,7 @@ var SearchObject = function($, replaceEle) {
 };
 
 //根据屏幕分辨率选择替换的元素
-var ele = (window.innerWidth > 1024 ? '#top_menu_other' : 'div.remaining');
+var ele = (window.innerWidth > 1024 ? '#ad-header-tips' : 'div.remaining');
 
 //启动
 SearchObject(jQuery, ele).init('Bing'); //to use original google, please replace parameter with 'Google';
