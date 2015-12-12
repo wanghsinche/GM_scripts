@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         haitao
-// @version      0.1.5
+// @version      0.1.6
 // @description  惠惠海淘自动脚本，使用时打开脚本就行，自动运行的。抢到单就自动停止，否则会一直抢。保留一切版权。
 // @author       Wanghsinche 
 // @include      http://buyers.youdao.com/list*
@@ -13,12 +13,112 @@ var timer;
 var success = false;
 var order=false;
 var showout=false;
+var btnlst=[];
+var positive=true;//true是点击第一个复合条件的账单，改为false就是点最后一个账单
+//账号密码在这里添加
+var accountlst=[
+	{username:'2323861569@qq.com',password:'ilovechina..'},
+	{username:'du0329@qq.com',password:'ilovechina..'}
+];
+
+
+
+
+
+function insertHtml(accountlst){
+	var html='<form action="https://buyers.youdao.com/auth/login" method="post" >'+
+		'<input  name="username" type="Hidden" placeholder="Email" value=[un]>'+
+		'<input  name="password" type="Hidden" placeholder="password" value=[pw]>'+
+		'<input type="submit" class="button postfix margin-top-small login-button" value="[un]">'+
+		'</form>';
+	var finalhtml="";
+	$.each(accountlst,function(index,val){
+		finalhtml+=html.replace(/\[un\]/g,val.username).replace(/\[pw\]/g,val.password);
+	});
+	$('.pagination').before(finalhtml);
+
+}
+function extendHaitao(p) {
+	var parent = p.prototype;
+	var haitao.parent="netase";
+　　　　var c = {};
+　　　　for (var i in parent) {
+　　　　　　c[i] = parent[i];
+　　　　　　}
+　　　　c.uber = parent;
+　　　　return c;
+　　}
+function extendyoudao(Parent,haitao) {
+
+　　　　var F = function(){};
+　　　　F.prototype = Parent.prototype;
+　　　　Child.prototype = new F();
+　　　　Child.prototype.constructor = Child;
+　　　　Child.uber = Parent.prototype;
+	return new F();
+　　}	
 function judgeHasOrder() {
+	var only6pn=false;
 	if ($('.all-list-tbody').children().length !== 0) {
 		console.log('it should be click');
 		order=true;
-		$(".-order-compete-button:last").trigger('click'); //click last one 
+		btnlst=$(".-order-compete-button");
+		only6pn=true;
+		if (positive) {
+			for (var i = 0; i < btnlst.length; i++) {
+				if($(btnlst[i]).closest('tr').find('td').eq(2).text()==='amazon.com'){
+					only6pn=false;
+					$(btnlst[i]).trigger('click');
+					break;
+				}
+			}			
+		}else{
+			for (var i = btnlst.length - 1; i >= 0; i--) {
+				if($(btnlst[i]).closest('tr').find('td').eq(2).text()==='amazon.com'){
+					only6pn=false;
+					$(btnlst[i]).trigger('click');
+					break;
+				}
+			}
+		}
+		if(only6pn){
+			location.reload();
+		}
+		$.each(btnlst,function(index,val){
+			if($(index).closest('tr').find('td').eq(2).text()==='success'){
+				console.log('click');
+				return false;
+			}
+		});	
+		define(['jquery'],function($){
+			var ModalClass=function(id){
+				this.id=id;
+				$('.modal-content').append('<div class="modal-content-body" id="'+this.id+'"></div>');
+				$('body').on('click','.modal-background, .modal-close',this, function(e) {
+					e.preventDefault();
+					if (e.target === e.currentTarget){
+						e.data.hide();
+					}
+				});
+				this.modalContent=$('.modal-content');
+
+			};
+			ModalClass.prototype.insertHtml=function(html){
+				$('#'+this.id).html(html);
+			};
+			ModalClass.prototype.show=function(){
+				$('.modal-background,.modal-content,#'+this.id).addClass('active');
+				this.modalContent.css({'margin-top':-this.modalContent.height()/2,'margin-left':-this.modalContent.width()/2});
+			};
+			ModalClass.prototype.hide=function(){
+				$('.modal-background,.modal-content,#'+this.id).removeClass('active');
+			};
+
+			return ModalClass;
+		});		
+		// $(".-order-compete-button:last").trigger('click'); //click last one 
 		//$(".-order-compete-button:first").trigger('click');//click first one 
+
 	} else {
 		console.log("finding...");
 		timer = setTimeout(function() {
@@ -68,8 +168,12 @@ var wxzscript = "<script type='text/javascript'>window.alert = function alert(ms
 $('script[src="/script/list.js"]').after(wxzscript);
 
 $('label').trigger('click');
-console.log('v0.1.5');
+console.log('v0.1.6');
+
+insertHtml(accountlst);
 
 judgeSuccess(); /* ring tone */
 judgeShowOut();
 judgeHasOrder(); /* Act on the event */
+
+
