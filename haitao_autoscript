@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         haitao
-// @version      0.1.6
+// @version      0.2.0
 // @description  惠惠海淘自动脚本，使用时打开脚本就行，自动运行的。抢到单就自动停止，否则会一直抢。保留一切版权。
 // @author       Wanghsinche 
 // @include      http://buyers.youdao.com/list*
@@ -38,9 +38,8 @@ function insertHtml(accountlst){
 	$('.pagination').before(finalhtml);
 
 }
-function extendHaitao(p) {
+function extend2(p) {
 	var parent = p.prototype;
-	var haitao.parent="netase";
 　　　　var c = {};
 　　　　for (var i in parent) {
 　　　　　　c[i] = parent[i];
@@ -48,17 +47,19 @@ function extendHaitao(p) {
 　　　　c.uber = parent;
 　　　　return c;
 　　}
-function extendyoudao(Parent,haitao) {
+function extend(Parent) {
 
 　　　　var F = function(){};
+// 	var Child={};
 　　　　F.prototype = Parent.prototype;
-　　　　Child.prototype = new F();
-　　　　Child.prototype.constructor = Child;
-　　　　Child.uber = Parent.prototype;
+// 　　　　Child.prototype = new F();
+// 　　　　Child.prototype.constructor = Child;
+// 　　　　Child.uber = Parent.prototype;
+
 	return new F();
 　　}	
 function judgeHasOrder() {
-	var only6pn=false;
+	//var only6pn=false;
 	if ($('.all-list-tbody').children().length !== 0) {
 		console.log('it should be click');
 		order=true;
@@ -67,7 +68,7 @@ function judgeHasOrder() {
 		if (positive) {
 			for (var i = 0; i < btnlst.length; i++) {
 				if($(btnlst[i]).closest('tr').find('td').eq(2).text()==='amazon.com'){
-					only6pn=false;
+			//		only6pn=false;
 					$(btnlst[i]).trigger('click');
 					break;
 				}
@@ -75,15 +76,15 @@ function judgeHasOrder() {
 		}else{
 			for (var i = btnlst.length - 1; i >= 0; i--) {
 				if($(btnlst[i]).closest('tr').find('td').eq(2).text()==='amazon.com'){
-					only6pn=false;
+			//		only6pn=false;
 					$(btnlst[i]).trigger('click');
 					break;
 				}
 			}
 		}
-		if(only6pn){
-			location.reload();
-		}
+		//if(only6pn===true){
+		//	location.reload();
+		//}
 		$.each(btnlst,function(index,val){
 			if($(index).closest('tr').find('td').eq(2).text()==='success'){
 				console.log('click');
