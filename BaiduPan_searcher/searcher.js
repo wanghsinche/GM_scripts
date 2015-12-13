@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       百度云插件+APIKey
 // @namespace  
-// @version    4.4.4.1 beta
+// @version    4.4.4.2 beta
 // @description  在百度云网盘的页面添加一个搜索框，调用搜索API搜索所有公开分享文件// To add a search frame that calls some api for searching some public shared files in BaiduYun cloud netdisk. 
 // @require        http://code.jquery.com/jquery-2.1.1.min.js
 // @description  For more imformation,please email me at wang0xinzhe@gmail.com. 
@@ -67,10 +67,10 @@
 var SearchObject = function($, replaceEle) {
     var keyword = '',
         flag = '',
-        info = 'Created by Wang Hsin-che @ 2014 04. The current version is 4.4.4.1';
+        info = 'Created by Wang Hsin-che @ 2014 04. The current version is 4.4.4.2';
 
     function searchClear() {
-        $('#wxz_myDiv').slideUp();
+        $('#wxz_myDiv').hide();
         $('#wxz_input').val('');
         keyword = '';
         $('.wxz-content').empty(); //清空原来的内容
@@ -111,7 +111,7 @@ var SearchObject = function($, replaceEle) {
         }
         //显示loading条
         $('.wxz-content').html('<img src="data:image/gif;base64,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" />');
-        $('#wxz_myDiv').slideDown();
+        $('#wxz_myDiv').show();
         GM_xmlhttpRequest({
             method: "GET",
             url: url,
@@ -377,13 +377,15 @@ var SearchObject = function($, replaceEle) {
                 <input type="button" value="GO" class="search-button" id="wxz_searchButton"></div></li>',
             //显示页面的html
             html_2 = '\
-    <div class="b-panel b-dialog share-dialog" id="wxz_myDiv" style="z-index:99">\
-    <div class="dlg-hd b-rlv" id="wxz_myDiv_title">\
-    <div title="关闭" id="wxz_closeButton" class="dlg-cnr dlg-cnr-r"></div>\
-    <h3 >搜索</h3>\
+    <div class="dialog dialog-gray" id="wxz_myDiv" style="z-index:99">\
+    <div class="dialog-header dialog-drag" id="wxz_myDiv_title">\
+    <h3 ><span class="dialog-header-title">搜索</span></h3>\
+    <div class="dialog-control" id="wxz_closeButton"><span class="dialog-icon dialog-close"></span></div>\
     </div>\
+    <div class="dlg-bd g-clearfix offline-list-dialog">\
     <div class="wxz-content">\
     </div>\
+    <div class="dlg-bd g-clearfix offline-list-dialog">\
     <div class="offline-bottom">\
     <div class="offline-pageing">\
     <div class="pagese " id="wxz-pagese">\
@@ -392,6 +394,8 @@ var SearchObject = function($, replaceEle) {
     </div>\
     </div>\
     ',
+
+    
     html_4='<li node-type="menu-nav" data-key="searcher" class="wxz-menu info-i wxz-dropdown has-pulldown">\
                 <em class="f-icon pull-arrow"></em>\
                 <span node-type="username" class="name top-username" id="wxzMenuDisplay" style="width: auto;">'+flag+'</span>\
@@ -417,7 +421,7 @@ var SearchObject = function($, replaceEle) {
                 cssText = '\
     <style type="text/css">\
         #wxz_searchButton{background-image:none;cursor:pointer;background-color: rgb(155, 154, 154);color: #ffffff;}\
-            .wxz-content{line-height: 200%;text-align: left;white-space: normal;margin-left:20px;overflow:auto;}\
+            .wxz-content{width: 700px;line-height: 200%;text-align: left;white-space: normal;margin-left:20px;overflow:auto;}\
             .wxz-close{margin-right:20px;important;height:20px;cursor:pointer}\
             .wxz-next{margin-right:20px;float:right;height:20px;cursor:pointer}\
             .wxz-front{margin-right:40px;float:right;height:20px;cursor:pointer}\
