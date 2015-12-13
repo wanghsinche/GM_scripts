@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         haitao
-// @version      0.2.0
+// @version      0.2.1
 // @description  惠惠海淘自动脚本，使用时打开脚本就行，自动运行的。抢到单就自动停止，否则会一直抢。保留一切版权。
 // @author       Wanghsinche 
 // @include      http://buyers.youdao.com/list*
@@ -14,11 +14,13 @@ var success = false;
 var order=false;
 var showout=false;
 var btnlst=[];
-var positive=true;//true是点击第一个复合条件的账单，改为false就是点最后一个账单
+var btnposition="right";//选项为 left  right  和 center
+var positive=true;//true是点击第一个符合条件的账单，改为false就是点最后一个账单
 //账号密码在这里添加
+var judgeTime=2000;//判断时间的间隔
 var accountlst=[
-	{username:'2323861569@qq.com',password:'ilovechina..'},
-	{username:'du0329@qq.com',password:'ilovechina..'}
+	{username:'2323861569@qq.com',password:'ilovechina..',oname:'杜子腾'},
+	{username:'du0329@qq.com',password:'ilovechina..',oname:'杜琪琪'}
 ];
 
 
@@ -26,14 +28,14 @@ var accountlst=[
 
 
 function insertHtml(accountlst){
-	var html='<form action="https://buyers.youdao.com/auth/login" method="post" >'+
+	var html='<form action="https://buyers.youdao.com/auth/login" method="post" style="display:inline-block;margin:5px;float:'+btnposition+';">'+
 		'<input  name="username" type="Hidden" placeholder="Email" value=[un]>'+
 		'<input  name="password" type="Hidden" placeholder="password" value=[pw]>'+
-		'<input type="submit" class="button postfix margin-top-small login-button" value="[un]">'+
+		'<input type="submit" style="padding: 5px;border-radius: 5px;"class="button postfix margin-top-small login-button" value="[na]">'+
 		'</form>';
 	var finalhtml="";
 	$.each(accountlst,function(index,val){
-		finalhtml+=html.replace(/\[un\]/g,val.username).replace(/\[pw\]/g,val.password);
+		finalhtml+=html.replace(/\[un\]/g,val.username).replace(/\[pw\]/g,val.password).replace(/\[na\]/g,val.oname);
 	});
 	$('.pagination').before(finalhtml);
 
@@ -156,12 +158,12 @@ function judgeShowOut(){
 	}
 	if(showout){
 		console.log('judgeShowOut success');
-		setTimeout(function(){location.reload();},2000);
+		setTimeout(function(){location.reload();},judgeTime);
 	}
 	else{
 		setTimeout(function(){
 			judgeShowOut();
-		},2000);
+		},judgeTime);
 	}
 }
 
@@ -169,7 +171,7 @@ var wxzscript = "<script type='text/javascript'>window.alert = function alert(ms
 $('script[src="/script/list.js"]').after(wxzscript);
 
 $('label').trigger('click');
-console.log('v0.1.6');
+console.log('v0.2.1');
 
 insertHtml(accountlst);
 
