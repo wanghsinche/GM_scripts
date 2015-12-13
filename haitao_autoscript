@@ -17,7 +17,7 @@ var btnlst=[];
 var btnposition="right";//选项为 left  right  和 center
 var positive=true;//true是点击第一个符合条件的账单，改为false就是点最后一个账单
 //账号密码在这里添加
-var judgeTime=2000;//判断时间的间隔
+var judgeTime=500;//判断时间的间隔
 var accountlst=[
 	{username:'2323861569@qq.com',password:'ilovechina..',oname:'杜子腾'},
 	{username:'du0329@qq.com',password:'ilovechina..',oname:'杜琪琪'}
@@ -126,7 +126,7 @@ function judgeHasOrder() {
 		console.log("finding...");
 		timer = setTimeout(function() {
 			judgeHasOrder();
-		}, 500);
+		}, judgeTime);
 	}
 }
 
@@ -158,12 +158,12 @@ function judgeShowOut(){
 	}
 	if(showout){
 		console.log('judgeShowOut success');
-		setTimeout(function(){location.reload();},judgeTime);
+		setTimeout(function(){location.reload();},2000);
 	}
 	else{
 		setTimeout(function(){
 			judgeShowOut();
-		},judgeTime);
+		},2000);
 	}
 }
 
