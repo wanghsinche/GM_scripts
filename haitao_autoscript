@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         haitao
-// @version      0.2.1
+// @version      0.2.2
 // @description  惠惠海淘自动脚本，使用时打开脚本就行，自动运行的。抢到单就自动停止，否则会一直抢。保留一切版权。
 // @author       Wanghsinche 
 // @include      http://buyers.youdao.com/list*
@@ -28,7 +28,7 @@ var accountlst=[
 
 
 function insertHtml(accountlst){
-	var html='<form action="https://buyers.youdao.com/auth/login" method="post" style="display:inline-block;margin:5px;float:'+btnposition+';">'+
+	var html='<form action="https://buyers.youdao.com/auth/login" method="post" style="display:inline-block;margin:5px;">'+
 		'<input  name="username" type="Hidden" placeholder="Email" value=[un]>'+
 		'<input  name="password" type="Hidden" placeholder="password" value=[pw]>'+
 		'<input type="submit" style="padding: 5px;border-radius: 5px;"class="button postfix margin-top-small login-button" value="[na]">'+
@@ -37,7 +37,8 @@ function insertHtml(accountlst){
 	$.each(accountlst,function(index,val){
 		finalhtml+=html.replace(/\[un\]/g,val.username).replace(/\[pw\]/g,val.password).replace(/\[na\]/g,val.oname);
 	});
-	$('.pagination').before(finalhtml);
+	//$('.pagination').before(finalhtml);
+	$('.breadcrumbs').append('<li style="float:'+btnposition+';">'+finalhtml+'</li>');
 
 }
 function extend2(p) {
@@ -171,7 +172,7 @@ var wxzscript = "<script type='text/javascript'>window.alert = function alert(ms
 $('script[src="/script/list.js"]').after(wxzscript);
 
 $('label').trigger('click');
-console.log('v0.2.1');
+console.log('v0.2.2');
 
 insertHtml(accountlst);
 
