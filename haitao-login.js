@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         haitao--login
-// @version      0.1
+// @version      0.1.1
 // @description  惠惠海淘登陆切换脚本。保留一切版权。
 // @author       Wanghsinche 
 // @include      http://buyers.youdao.com/*
@@ -42,12 +42,12 @@ AccountClass.prototype.postRequest=function(){
 };
 
 AccountClass.prototype.setUI=function(){
-	var temphtml="<button class='btn login-button margin-top-small' style='[css]' >[user]</button>";
+	var temphtml="<a href='javascript:;' class='btn login-button margin-top-small' style='[css]' >[user]</a>";
 	var html,css,btnEle;
 	if(this.current){
-		css="cursor:not-allowed;background:grey;margin:5px;display:inline-block;padding:5px;border-radius:5px;";
+		css="cursor:not-allowed;background:grey;margin:5px;padding:5px;border-radius:5px;text-decoration:none;color:white!important;";
 	}else{
-		css="margin:5px;display:inline-block;padding:5px;border-radius:5px;";
+		css="margin:5px;padding:5px;border-radius:5px;background:#008cba;text-decoration:none;color:white!important;";
 	}
 	html=temphtml.replace(/\[user\]/g,this.user).replace(/\[css\]/g,css);
 	btnEle=$(html);
@@ -88,6 +88,7 @@ if(define){
 }
 
 $('.breadcrumbs').append('<li id="mylst" style="float:'+btnposition+';"></li>');
+$('.breadcrumbs a').css('line-height:58px');
 
 for (var i = accountlst.length - 1; i >= 0; i--) {
 	(new AccountClass(accountlst[i]['username'],accountlst[i]['password'],accountlst[i]['oname'])).setUI();
