@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name       百度云插件+APIKey
+// @name       百度云插件+APIKey++
 // @namespace  
-// @version    4.4.4.2 beta
+// @version    4.5.0.0 beta
 // @description  在百度云网盘的页面添加一个搜索框，调用搜索API搜索所有公开分享文件// To add a search frame that calls some api for searching some public shared files in BaiduYun cloud netdisk. 
 // @require        http://code.jquery.com/jquery-2.1.1.min.js
 // @description  For more imformation,please email me at wang0xinzhe@gmail.com. 
@@ -13,6 +13,48 @@
 // @run-at document-end
 // @copyright  2014,04,20 __By Wang Hsin-che   
 // ==/UserScript==
+
+/*thanks to the tutorial of mvc  at 
+https://alexatnet.com/articles/model-view-controller-mvc-javascript*/
+
+
+//Event is a simple class for implementing the Observer pattern:
+function Event(sender) {
+    this._sender = sender;
+    this._listeners = [];
+}
+
+Event.prototype = {
+    attach : function (listener) {//push the callback function into _listeners[];
+        this._listeners.push(listener);
+    },
+    notify : function (args) {//pop all the callback functions and execute the functions with same args?
+        var index;
+
+        for (index = 0; index < this._listeners.length; index += 1) {
+            this._listeners[index](this._sender, args);//auto pass sender and args into callback function, so the default form of callback function is function(sender,args){}
+        }
+    }
+};
+
+//Javascript-template-engine-in-just-20-line
+//by by Krasimir http://krasimirtsonev.com/blog/article/Javascript-template-engine-in-just-20-line
+var TemplateEngine = function(html, options) {
+    var re = /<%([^%>]+)?%>/g, reExp = /(^( )?(if|for|else|switch|case|break|{|}))(.*)?/g, code = 'var r=[];\n', cursor = 0, match;
+    var add = function(line, js) {
+        js? (code += line.match(reExp) ? line + '\n' : 'r.push(' + line + ');\n') :
+            (code += line != '' ? 'r.push("' + line.replace(/"/g, '\\"') + '");\n' : '');
+        return add;
+    };
+    while(match = re.exec(html)) {
+        add(html.slice(cursor, match.index))(match[1], true);
+        cursor = match.index + match[0].length;
+    }
+    add(html.substr(cursor, html.length - cursor));
+    code += 'return r.join("");';
+    return new Function(code.replace(/[\r\t\n]/g, '')).apply(options);
+};
+
 //////////////////////////////////////////////////////////////////////
 /////jQuery draggable plugin v0.2 by Wang Hsin-che @ 2014 08///////////////
 /////usage: $(selector).draggable({handel:'handle',msg:{},callfunction:function(){}});
@@ -63,320 +105,278 @@
 
 
 
-/////定义
-var SearchObject = function($, replaceEle) {
-    var keyword = '',
-        flag = '',
-        info = 'Created by Wang Hsin-che @ 2014 04. The current version is 4.4.4.2';
+/**
+ * The Model. Model stores items and notifies
+ * observers about changes.
+ */
 
-    function searchClear() {
-        $('#wxz_myDiv').hide();
-        $('#wxz_input').val('');
-        keyword = '';
-        $('.wxz-content').empty(); //清空原来的内容
-        console.log('clear');
-    }
-
-    function search(keyword, startIndex) {
-        var url;
-        if (keyword === '') {
-            console.log('fail');
-            return 0;
-        }
-        console.log('search');
-        switch (flag) {
-            case 'Bing': 
-                url = 'http://cn.bing.com/search?q=';//http://cn.bing.com/search?q=rk3368+site:pan.baidu.com;ie=utf-8 
-                url = url + keyword + '+site%3Apan.baidu.com' + '&first=' + startIndex;
-                break;
-            case 'repigu':
-                url = 'https://repigu.com/uds/GwebSearch?rsz=filtered_cse&hl=zh_CN&cx=018177143380893153305:yk0qpgydx_e&v=1.0&amp;key=AIzaSyCVAXiUzRYsML1Pv6RwSG1gunmMikTzQqY&q=';
-                url = url + keyword + '&start=' + startIndex;
-                break;
-            case 'Repigu':
-                url = 'https://repigu.com/search?q=';
-                url = url + keyword + '+site:pan.baidu.com'+'&start=' + startIndex;
-                break;
-            case 'Google':
-                url = 'https://www.googleapis.com/customsearch/v1element?key=AIzaSyCVAXiUzRYsML1Pv6RwSG1gunmMikTzQqY&rsz=filtered_cse&num=10&hl=en&prettyPrint=true&source=gcsc&gss=.com&sig=ee93f9aae9c9e9dba5eea831d506e69a&cx=018177143380893153305:yk0qpgydx_e&q=';
-                url = url + keyword + '&start=' + startIndex;
-                break;
-            case 'SOSO':
-                url = 'http://www.sogou.com/web?query=';
-                url = url + keyword + '+site%3Apan.baidu.com' + '&page=' + parseInt(startIndex / 10, 10) + 1;
-                break;
-            default:
-                console.log('error');
-                return 0;
-        }
-        //显示loading条
-        $('.wxz-content').html('<img src="data:image/gif;base64,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" />');
-        $('#wxz_myDiv').show();
+ var BaseModel=function(engineLst){
+    this.keyword="";
+    this.engine="default";
+    this.engineLst=engineLst;
+    this.jsonObj={ 
+                    cursor: { 
+                        estimatedResultCount: 0, 
+                        resultCount: 0 }, 
+                    results: []
+                };
+    this.curr=1;
+    this.totalPage=1;
+    this.urls={default:'http://',};
+    this.state=false;
+    this.contentUpdated=new Event(this);
+    this.requestEvent=new Event(this);
+ };
+ BaseModel.prototype={
+    setEngine:function(engine){
+        this.engine=engine;
+    },
+    updateCurr:function(curr){
+        this.curr=curr;
+    },
+    updateKeyword:function(keyword){
+        this.keyword=keyword;
+    },
+    request:function(){
+        this.requestEvent.notify();
+        var _this=this;
         GM_xmlhttpRequest({
-            method: "GET",
-            url: url,
-            headers: {
-                "User-Agent": "Mozilla/5.0", // If not specified, navigator.userAgent will be used.
-                "Accept": "text/xml" // If not specified, browser defaults will be used.
-            },
-            onload: function(response) {
-                var
-                    data,
-                    showList,
-                    tempNode,
-                    totalPage = 1,
-                    totalResults;
-                switch (flag) {
-                    case 'Google':
-                        data = JSON.parse(response.responseText);
-                        break;
-                    case 'Bing': 
-                        data = bingToData(response.responseText);
-                        break;
-                    case 'repigu':
-                        data = mirrorToData(response.responseText);
-                        break;
-                    case 'Repigu':
-                        data = repiguToData(response.responseText);
-                        break;
-                    case 'SOSO':
-                        data = sosoToData(response.responseText);
-                        break;
-                    default:
-                        console.log('error');
-                        return 0;
-                }
-                totalResults = parseInt(data.cursor.estimatedResultCount, 10);
-                //把json数据转为html，存入缓存showlist
-                if (parseInt(data.cursor.resultCount, 10) === 0) {
-                    $('.wxz-content').html('<div class="loading-tips" align="center">无搜索结果...换个关键词重新试试？</div>');
-                } //无结果时提示
-                else {
-                    totalPage = parseInt((totalResults - 1) / 10, 10) + 1 > 10 ? 10 : parseInt((totalResults - 1) / 10, 10) + 1; //坑比，google自定义搜索只提供最大10页（每页10条）
-                    showList = "<p align='right'>---- by " + flag + ".com Search </p><p white-space='normal' class='temp' >keyword is    '" + keyword + "'    found  '" + data.cursor.resultCount + "'  Results</p><p>--------------------------------------------------<p>";
-                    $.each(data.results, function(index, element) {
-                        tempNode = '<a href="' + element.unescapedUrl + '"target="_blank">' + element.titleNoFormatting + '</a>';
-                        showList += '<p><p class="myTitle">' + tempNode + '</p>';
-                        showList += '<p class="mySnippet">' + element.contentNoFormatting + '</p>';
-                    });
-                    showList += '<p><p>-------------------------------------------------------------<p class="temp" margin-left="20px">"' + data.results.length + '"  items have been load </p>';
-                    $('.wxz-content').html(showList); //替换原来内容，之所以用了showlist作为缓存是为了提升速度
-                    $('.wxz-content').scrollTop(0); //滚到顶端
-                }
-                addAboutInfo(info);
-                pageBar(parseInt(startIndex / 10, 10) + 1, totalPage);
-                data = null;
-                tempNode = null;
-                totalPage = null;
-                totalResults = null;
-                showList = null;
-            },
-            onerror: function() {
-                $('.wxz-content').html('<div class="loading-tips" align="center">出错了......</div>');
-                console.log("error");
-                return 0;
-            }
-        });
-    }
+                    method: "GET",
+                    url: _this.compileUrl[_this.engine](_this),
+                    headers: {
+                        "User-Agent": "Mozilla/5.0", // If not specified, navigator.userAgent will be used.
+                        "Accept": "text/xml" // If not specified, browser defaults will be used.
+                    },
+                    onload: function(response) {
+                        _this.jsonObj=_this.toJson[_this.engine](response.responseText);
+                        _this.totalPage=(parseInt(_this.jsonObj.cursor.resultCount)-parseInt(_this.jsonObj.cursor.resultCount)%10)/10+1;
+                        _this.state=true;
+                        var _self=_this;
+                        _this.contentUpdated.notify(_self.state);                   
+                    },
+                    onerror: function() {
+                        _this.jsonObj={ 
+                                            cursor: { 
+                                                estimatedResultCount: 0, 
+                                                resultCount: 0 }, 
+                                            results: []
+                                        };
+                        _this.totalPage=1;
+                        _this.state=false;
+                        var _self=_this;
+                        _this.contentUpdated.notify(_self.state);           
+                    }
+                });
+    },
+    destory:function(){
+        this.jsonObj={};
+        this.totalPage=0;
+        this.state=false; 
+        this.curr=0;
+        this.keyword="";
+    },
+    toJson:{
+        default:function(text){
+            var jsonObj = { 
+                    cursor: { 
+                        estimatedResultCount: 0, 
+                        resultCount: 0 }, 
+                    results: []
+                };
 
-    function addAboutInfo(info) {
-        var temp = '<p align="right"><a href="javascript:alert(' + "'" + info + "'" + ')" ><font color="#333">About me</font></a></p>';
-        $('.wxz-content').append(temp);
-    }
-    function bingToData(html) { 
-    var data = { cursor: { estimatedResultCount: 0, resultCount: 0 }, results: [] };
-    //其中一条结果：
-    //<li class="b_algo"><h2>
-    //<a href="http://pan.baidu.com/wap/link?uk=2923110658&amp;shareid=3468815834&amp;third=3" target="_blank" h="ID=SERP,5101.1">YFK-<strong>RK3368</strong>-8189-20150821.rar_免费高速下载|百度云 网盘 ...</a></h2>
-    //<div class="b_caption"><p>文件名:YFK-<strong>RK3368</strong>-8189-20150821.rar 文件大小:497.55M 分享者:晨芯FAE 分享时间:2015-8-21 14:07 下载次数:5 ... 登录百度云客户端送2T空间 电脑版</p>
-    //<div class="b_attribution" u="0|5058|4835271386991248|8OMhcGIIj8GW08I41R5UoSyJpl2_5Pny"><cite><strong>pan.baidu.com</strong>/wap/link?uk=2923110658&amp;shareid=3468815834&amp;...</cite><span class="c_tlbxTrg">
-    //<span class="c_tlbxH" H="BASE:CACHEDPAGEDEFAULT" K="SERP,5102.1"></span></span></div></div></li>
-    //http://www.jb51.net/article/49083.htm在JS中解析HTML字符串示例代码：
-    var el = $( '<div></div>' ); 
-    el.html(html); 
-    var b_results = $("#b_results", el);
-    var b_algo_Arry = $("li.b_algo", b_results);
-    $.each(b_algo_Arry, function(index, val) {
-        var tempResult = {
-            unescapedUrl: "",
-            titleNoFormatting: "",
-            contentNoFormatting: ""
-        };
-        tempResult.unescapedUrl = $(val).find("h2 a").attr('href');
-        tempResult.titleNoFormatting = $(val).find("h2 a").text();
-        tempResult.contentNoFormatting = $(val).find('div.b_caption p').text();
-        data.results.push(tempResult);
+            return jsonObj;
+        },
+    },
+    compileUrl:{
+        default:function(_this){
+                return _this.url + _this.keyword + '+site%3Apan.baidu.com' + '&first=' + _this.curr;
+            },        
+    },
+ };
+
+ var Viewer=function(model,UIelements){
+    this.model=model;
+    this.UI=UIelements;
+    this.searchClick=new Event(this);
+    this.closeClick=new Event(this);
+    this.nextClick=new Event(this);
+    this.preClick=new Event(this);
+    this.toPageClick=new Event(this);
+    this.engineOptChange=new Event(this);
+
+    var _self=this;
+    this.UI.searchBtn.click(function(event) {
+        /* Act on the event */
+        var curr=1;
+        var keyword=_self.UI.inputEle.val();
+        if(keyword.replace(/\s*/,'')!==''){
+            _self.searchClick.notify({curr:curr,keyword:keyword});
+        }
     });
-    ////处理统计结果
-    var rawResultCount=$('.sb_count',b_results).text();
-    var matchLst=[];    
-    matchLst=rawResultCount.match(/([0-9]{1,3}(,[0-9]{3})+)/g);
-    if(matchLst!==null){//匹配100,000,111之类的情况
-        data.cursor.resultCount=matchLst[0].replace(',','');
-    }else{
-        matchLst=rawResultCount.match(/\d+/g);
-        if(matchLst!==null){//匹配10 个结果之类的情况，以及1-11，共11个的情况
-        data.cursor.resultCount=matchLst.pop();
-        }else{//匹配无的情况
-        data.cursor.resultCount=0;
-        }
-    }
-    data.cursor.resultCount = parseInt( data.cursor.resultCount.toString(),10);
-    data.cursor.estimatedResultCount = data.cursor.resultCount;
-    return data;
-}
-    function mirrorToData(text){
-        var tempData=JSON.parse(text).responseData;
-        var data = {
-            cursor: {
-                estimatedResultCount: 0,
-                resultCount: 0
-            },
-            results: []
-            };
-        data.cursor.resultCount = parseInt(tempData.cursor.resultCount.replace(',', ''), 10);
-        data.cursor.estimatedResultCount = data.cursor.resultCount;
-        $.each(tempData.results, function(index, val) {
-                var tempResult = {
-                    unescapedUrl: "",
-                    titleNoFormatting: "",
-                    contentNoFormatting: ""
-                };
-                tempResult.unescapedUrl = val.unescapedUrl;
-                tempResult.titleNoFormatting = val.titleNoFormatting;
-                tempResult.contentNoFormatting = val.content;
-                data.results.push(tempResult);
-            /* iterate through array or object */
-        });
-        return data;
-    }
-    function sosoToData(html) {
-        var begin = html.search('<div id="main" class="main">'),
-            end = html.search('<div class="hintBox">');
-        var data = {
-                cursor: {
-                    estimatedResultCount: 0,
-                    resultCount: 0
-                },
-                results: []
-            },
-            rbJquery = $(html.slice(begin, end)).find('.rb');
-        $.each(rbJquery, function(index, val) {
-
-            if (index === 0) {
-                data.cursor.resultCount = parseInt($(val).find('em').text().replace(',', ''), 10);
-                data.cursor.estimatedResultCount = data.cursor.resultCount;
-            } else {
-                var tempResult = {
-                    unescapedUrl: "",
-                    titleNoFormatting: "",
-                    contentNoFormatting: ""
-                };
-                tempResult.unescapedUrl = $(val).find("h3 a").attr('href');
-                tempResult.titleNoFormatting = $(val).find("h3 a").text();
-                tempResult.contentNoFormatting = $(val).find('div.ft').text();
-                data.results.push(tempResult);
+    this.UI.closeBtn.click(function(event) {
+        /* Act on the event */
+        _self.closeClick.notify();
+    });
+    this.UI.inputEle.keyup(function(event) {
+            if (event.which == 13) {
+                _self.UI.searchBtn.trigger('click');
             }
-            /* iterate through array or object */
         });
-        return data;
-    }
-    function repiguToData(html) {
-        // var begin = html.search('<div id="res">'),
-        //     end = html.search('<div id="foot">');
-        var data = {
-                cursor: {
-                    estimatedResultCount: 0,
-                    resultCount: 0
-                },
-                results: []
-            },
-            rbJquery = $(html).find('.g');
+    $('body').on('click',this.UI.engineBtn.selector,function(){
+        var engine=$(this).data('engine');
+        _self.engineOptChange.notify(engine);
+    });
+    $('body').on('click',this.UI.toPageBtn.selector,function(){
+        var page=$(this).data('page');
+        _self.toPageClick.notify(page);
+    });
+
+    this.UI.myDiv.draggable({
+        handle: "#wxz_myDiv_title"
+    });
+
+                  
+ };
+ Viewer.prototype={
+    refleshEngineLst:function(){
+        var template='<%for(var i in this){%>'+
+                    '<span node-type="click-ele" data-engine="<%this[i]%>" class="li wxz-menu-option">'+
+                            '<a >by <%this[i]%></a>'+
+                    '</span>'+
+                    '<%}%>';
+        var html=TemplateEngine(template,this.model.engineLst);
+        this.UI.engineLst.html(html);
+    },
+    updateEngine:function(){
+        this.UI.menu.text(this.model.engine);
+    },
+    show:function(){
+        this.UI.myDiv.show();
+    },
+    reflesh:function(success){
+        var template="<p align='right'>---- by <%this.engine%>.com Search </p><p white-space='normal' class='temp' >keyword is    '<%this.keyword%>'    found  '<%this.jsonObj.cursor.resultCount%>'  Results</p><p>--------------------------------------------------<p>";
         
-        data.cursor.resultCount = parseInt($(html).find('#resultStats').text().slice(4).replace(',', ''), 10);
-        data.cursor.estimatedResultCount = data.cursor.resultCount;
+        template+='<%for(var i in this.jsonObj.results){%>'+
+                         '<p><p class="myTitle">'+
+                            '<a href="<%this.jsonObj.results[i].unescapedUrl%>"target="_blank"><%this.jsonObj.results[i].titleNoFormatting%></a>'+
+                         '</p>'+
+                         '<p class="mySnippet"><%this.jsonObj.results[i].contentNoFormatting%></p>'+
+                '<%}%>';
+        template+='<p><p>-------------------------------------------------------------<p class="temp" margin-left="20px">" <%this.jsonObj.results.length%> "  items have been load </p>';
+        var html;
+        if(success===false){
+            html='<div class="loading-tips" align="center">出错了......</div>';
+        }else{
+            if(this.model.jsonObj.results.length===0){
+                html='<div class="loading-tips" align="center">无搜索结果...换个关键词重新试试？</div>';
+            }else{
+                html=TemplateEngine(template,this.model);
+            }
+        }
 
-        $.each(rbJquery, function(index, val) {
-
-
-                var tempResult = {
-                    unescapedUrl: "",
-                    titleNoFormatting: "",
-                    contentNoFormatting: ""
-                };
-                tempResult.unescapedUrl = "https://repigu.com"+$(val).find("h3 a").attr('href');
-                tempResult.titleNoFormatting = $(val).find("h3 a").text();
-                tempResult.contentNoFormatting = $(val).find('.st').text();
-                data.results.push(tempResult);
-
-            /* iterate through array or object */
-        });
-        return data;
-    }
-    function pageBar(page, totalPage) {
-        var
-            html = '\
+        this.UI.myContent.html(html);
+    },
+    close:function(){
+        this.UI.myDiv.hide();
+        this.UI.inputEle.val("");
+    },
+    loading:function(){
+        this.UI.myContent.html('<img src="data:image/gif;base64,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" />');
+    },
+    refleshPageNavi:function(){
+        var page={curr:1,totalPage:1,pre:true,next:true,lst:[]};
+        page.curr=this.model.curr;
+        page.totalPage=this.model.totalPage>=10?10:this.model.totalPage;
+        page.pre=page.curr>1?true:false;
+        page.next=page.totalPage>page.curr?true:false;
+        for(var i=1;i<=page.totalPage;i++){
+            page.lst.push(i);
+        }
+        var template= '\
                 <div class="pagese "id="wxz-pagese">\
-                <a href="javascript:void(0)" class="page-prev mou-evt">上一页</a>\
-                <span class="page-content"></span>\
-                <a href="javascript:void(0)" class="page-next mou-evt">下一页</a>\
+                <span class="page-content">\
+                <a href="javascript:void(0)" class=" <% if(this.pre){ %> page-number <%}else{%> global-disabled <%}%> mou-evt" data-page="<%this.curr-1%>">上一页</a>\
+                <%for(var i in this.lst){%>\
+                    <span class="page-number <%if(this.lst[i]==this.curr){%> global-disabled <%}%>" data-page="<%this.lst[i]%>"><%this.lst[i]%></span>\
+                <%}%>\
+                </span>\
+                <a href="javascript:void(0)" class=" <% if(this.next){ %> page-number <%}else{%> global-disabled <%}%> mou-evt" data-page="<%this.curr+1%>">下一页</a>\
                 </div>\
-                ',
-            pageNodeHtml = '<span class="page-number"></span>',
-            i, c,
-            startPage = 10 * parseInt((page - 1) / 10, 10) + 1;
-        $('#wxz-pagese').replaceWith(html);
-        c = $('#wxz-pagese').find('.page-content').eq(0);
-        for (i = 0; i < 10; i++) {
-            if (i + startPage > totalPage) {
-                break;
-            }
-            if (i + startPage === page) {
-                $(pageNodeHtml).html(i + startPage).addClass('global-disabled').appendTo(c);
-            } else {
-                $(pageNodeHtml).html(i + startPage)
-                    .bind('click', {
-                        msg: i + startPage
-                    }, function(e) {
-                        search(keyword, (e.data.msg - 1) * 10);
-                    })
-                    .appendTo(c);
-            }
-        }
-        if (page <= 1) {
-            $('#wxz-pagese').find('.page-prev').eq(0).addClass('global-disabled');
-        } else {
-            $('#wxz-pagese').find('.page-prev').eq(0).bind('click', {
-                msg: page - 1
-            }, function(event) {
-                search(keyword, (event.data.msg - 1) * 10);
-            });
-        }
-        if (page >= totalPage) {
-            $('#wxz-pagese').find('.page-next').eq(0).addClass('global-disabled');
-
-        } else {
-            $('#wxz-pagese').find('.page-next').eq(0).bind('click', {
-                msg: page + 1
-            }, function(event) {
-                search(keyword, (event.data.msg - 1) * 10);
-            });
-        }
-        html = null;
-        pageNodeHtml = null;
-        i = null;
-        c = null;
-        startPage = null;
+                ';
+        var html=TemplateEngine(template,page);
+        this.UI.pagese.html(html);
     }
+ };
 
-    function setUI() {
-        //根据屏幕设置div的大小位置
-        var
-            html_1 = '<li node-type="click-ele pos-ele" data-key="none" class="info-i show-item">\
-            <div class="search-form" id="wxz_searchForm"><input class="search-query" placeholder=" 搜索公开分享文件" id="wxz_input">\
-                <input type="button" value="GO" class="search-button" id="wxz_searchButton"></div></li>',
-            //显示页面的html
-            html_2 = '\
+
+ var Controller=function(model,viewer){
+    this.model=model;
+    this.viewer=viewer;
+
+    var _self=this;
+
+    this.viewer.searchClick.attach(function(sender,args){
+        _self.search(args.curr,args.keyword);
+    });
+    this.viewer.closeClick.attach(function(){
+        _self.close();
+    });
+    this.viewer.engineOptChange.attach(function(sender,args){
+        _self.setEngine(args);
+    });
+    this.viewer.toPageClick.attach(function(sender,args){
+        _self.toPage(args);
+    });
+
+    this.model.requestEvent.attach(function(){
+        _self.loading();
+    }); 
+    this.model.contentUpdated.attach(function(state){
+        _self.reflesh(state);
+    });
+
+ };
+ Controller.prototype={
+    search:function(curr,args){
+        this.model.updateCurr(curr);
+        this.model.updateKeyword(args);
+        this.model.request();
+        this.viewer.show();
+    },
+    setEngine:function(engine){
+        this.model.setEngine(engine);
+        this.viewer.updateEngine();
+    },
+    toPage:function(toPageNum){
+        this.model.updateCurr(toPageNum);
+        this.model.request();
+    },
+    close:function(){
+        this.model.destory();
+        this.viewer.close();
+    },
+    loading:function(){
+        this.viewer.loading();
+    },
+    reflesh:function(){
+        this.viewer.reflesh();
+        this.viewer.refleshPageNavi();
+    },
+    refleshEngineLst:function(){
+        this.viewer.refleshEngineLst();
+    },
+ };
+
+
+ function initial(){
+
+    //根据屏幕设置div的大小位置
+    var
+    html_1 = '<li node-type="click-ele pos-ele" data-key="none" class="info-i show-item">\
+    <div class="search-form" id="wxz_searchForm"><input class="search-query" placeholder=" 搜索公开分享文件" id="wxz_input">\
+        <input type="button" value="GO" class="search-button" id="wxz_searchButton"></div></li>',
+    //显示页面的html
+    html_2 = '\
     <div class="dialog dialog-gray" id="wxz_myDiv" style="z-index:99">\
     <div class="dialog-header dialog-drag" id="wxz_myDiv_title">\
     <h3 ><span class="dialog-header-title">搜索</span></h3>\
@@ -395,110 +395,126 @@ var SearchObject = function($, replaceEle) {
     </div>\
     ',
 
-    
+    cssText = '\
+    <style type="text/css">\
+    #wxz_searchButton{background-image:none;cursor:pointer;background-color: rgb(155, 154, 154);color: #ffffff;}\
+    .wxz-content{width: 700px;line-height: 200%;text-align: left;white-space: normal;margin-left:20px;overflow:auto;}\
+    .wxz-close{margin-right:20px;important;height:20px;cursor:pointer}\
+    .wxz-next{margin-right:20px;float:right;height:20px;cursor:pointer}\
+    .wxz-front{margin-right:40px;float:right;height:20px;cursor:pointer}\
+    .wxz-content a{color:#0066FF!important;font: 14px/1.5 arial,sans-serif!important;}\
+    </style>\
+            ',
     html_4='<li node-type="menu-nav" data-key="searcher" class="wxz-menu info-i wxz-dropdown has-pulldown">\
                 <em class="f-icon pull-arrow"></em>\
-                <span node-type="username" class="name top-username" id="wxzMenuDisplay" style="width: auto;">'+flag+'</span>\
+                <span node-type="username" class="name top-username" id="wxzMenuDisplay" style="width: auto;"></span>\
                 <div node-type="menu-list" class="wxz-menu-content pulldown user-info" style="display: none;">\
                     <em class="arrow"></em>\
-                    <div class="content" style="height:auto">\
-                        <!--span node-type="click-ele" data-key="Repigu" class="li wxz-menu-option">\
-                            <a >by repigu</a>\
-                        </span--!>\
-                        <span node-type="click-ele" data-key="SOSO" class="li wxz-menu-option">\
-                            <a >by SOSO</a>\
-                        </span>\
-                        <span node-type="click-ele" data-key="Bing" class="li wxz-menu-option">\
-                            <a >by Bing</a>\
-                        </span>\
-                        <span node-type="click-ele" data-key="Google" class="li wxz-menu-option">\
-                            <a >by Google</a>\
-                        </span>\
+                    <div class="content" id="wxz_engineLst" style="height:auto">\
                         </div>\
                 </div>\
             </li>\
-    ',
-                cssText = '\
-    <style type="text/css">\
-        #wxz_searchButton{background-image:none;cursor:pointer;background-color: rgb(155, 154, 154);color: #ffffff;}\
-            .wxz-content{width: 700px;line-height: 200%;text-align: left;white-space: normal;margin-left:20px;overflow:auto;}\
-            .wxz-close{margin-right:20px;important;height:20px;cursor:pointer}\
-            .wxz-next{margin-right:20px;float:right;height:20px;cursor:pointer}\
-            .wxz-front{margin-right:40px;float:right;height:20px;cursor:pointer}\
-            .wxz-content a{color:#0066FF!important;font: 14px/1.5 arial,sans-serif!important;}\
-    </style>\
-                    ';
-        switch (replaceEle) {
-            case '#ad-header-tips':
-                $('div.info.clearfix ul').prepend(html_1);//切换按钮
-                $(replaceEle).remove(); //删除搜索栏了广告
+    ';
+    $('div.info.clearfix ul').prepend(html_1); //切换按钮
+    $('#ad-header-tips').remove(); //删除搜索栏了广告
     //          $('div.info.clearfix ul').prepend(html_1);//搜索按钮
-                break;
-            case 'div.remaining':
-                $(replaceEle).before(html_1);
-                $('#wxz_searchForm').addClass('side-options');
-                $('#wxz_searchButton').css({
-                    width: 40
-                });
-                break;
-        }
-        $('div.info.clearfix ul').prepend(html_4);//切换按钮
 
-        $('body').append(html_2);
-        $('head:first').append(cssText); //插入css
+    $('div.info.clearfix ul').prepend(html_4);//切换按钮
+    $('body').append(html_2);
+    $('head:first').append(cssText); //插入css
 
-        //应用大小和页面
-        $('.wxz-content').css({
-            height: window.innerHeight / 3 * 2
-        });
-        $('#wxz_myDiv').css({
-            top: window.innerHeight / 8,
-            left: window.innerWidth / 4
-        });
-        //应用拖拽
-        $("#wxz_myDiv").draggable({
-            handle: "#wxz_myDiv_title"
-        });
-    }
+    //应用大小和页面
+    $('.wxz-content').css({
+    height: window.innerHeight / 3 * 2
+    });
+    $('#wxz_myDiv').css({
+    top: window.innerHeight / 6,
+    left: window.innerWidth / 4
+    });
 
-    function bind() {
-        //绑定各种函数
-        $('#wxz_searchButton').click(function() {
-            keyword = $('#wxz_input').val();
-            search(keyword, 0);
+
+
+    var bdModel=new BaseModel(['bing','google']);
+
+    bdModel.urls.bing='http://cn.bing.com/search?q=';
+    bdModel.urls.google='https://www.googleapis.com/customsearch/v1element?key=AIzaSyCVAXiUzRYsML1Pv6RwSG1gunmMikTzQqY&rsz=filtered_cse&num=10&hl=en&prettyPrint=true&source=gcsc&gss=.com&sig=ee93f9aae9c9e9dba5eea831d506e69a&cx=018177143380893153305:yk0qpgydx_e&q=';
+
+    bdModel.toJson.bing=function(html){
+        var data = { cursor: { estimatedResultCount: 0, resultCount: 0 }, results: [] };
+        //其中一条结果：
+        //<li class="b_algo"><h2>
+        //<a href="http://pan.baidu.com/wap/link?uk=2923110658&amp;shareid=3468815834&amp;third=3" target="_blank" h="ID=SERP,5101.1">YFK-<strong>RK3368</strong>-8189-20150821.rar_免费高速下载|百度云 网盘 ...</a></h2>
+        //<div class="b_caption"><p>文件名:YFK-<strong>RK3368</strong>-8189-20150821.rar 文件大小:497.55M 分享者:晨芯FAE 分享时间:2015-8-21 14:07 下载次数:5 ... 登录百度云客户端送2T空间 电脑版</p>
+        //<div class="b_attribution" u="0|5058|4835271386991248|8OMhcGIIj8GW08I41R5UoSyJpl2_5Pny"><cite><strong>pan.baidu.com</strong>/wap/link?uk=2923110658&amp;shareid=3468815834&amp;...</cite><span class="c_tlbxTrg">
+        //<span class="c_tlbxH" H="BASE:CACHEDPAGEDEFAULT" K="SERP,5102.1"></span></span></div></div></li>
+        //http://www.jb51.net/article/49083.htm在JS中解析HTML字符串示例代码：
+        var el = $( '<div></div>' ); 
+        el.html(html); 
+        var b_results = $("#b_results", el);
+        var b_algo_Arry = $("li.b_algo", b_results);
+        $.each(b_algo_Arry, function(index, val) {
+            var tempResult = {
+                unescapedUrl: "",
+                titleNoFormatting: "",
+                contentNoFormatting: ""
+            };
+            tempResult.unescapedUrl = $(val).find("h2 a").attr('href');
+            tempResult.titleNoFormatting = $(val).find("h2 a").text();
+            tempResult.contentNoFormatting = $(val).find('div.b_caption p').text();
+            data.results.push(tempResult);
         });
-        $('#wxz_closeButton').click(function() {
-            searchClear();
-        });
-        $('.li.wxz-menu-option').click(function(){
-            flag=$(this).attr('data-key');
-            $('#wxzMenuDisplay').text(flag);
-            $('.wxz-menu-content').hide();
-        });
-        $('#wxz_input').keyup(function(event) {
-            if (event.which == 13) {
-                $('#wxz_searchButton').trigger('click');
+        ////处理统计结果
+        var rawResultCount=$('.sb_count',b_results).text();
+        var matchLst=[];    
+        matchLst=rawResultCount.match(/([0-9]{1,3}(,[0-9]{3})+)/g);
+        if(matchLst!==null){//匹配100,000,111之类的情况
+            data.cursor.resultCount=matchLst[0].replace(',','');
+        }else{
+            matchLst=rawResultCount.match(/\d+/g);
+            if(matchLst!==null){//匹配10 个结果之类的情况，以及1-11，共11个的情况
+            data.cursor.resultCount=matchLst.pop();
+            }else{//匹配无的情况
+            data.cursor.resultCount=0;
             }
-        });
-    
-}   return {
-        init: function(option) {
-            var
-                t = window.setInterval(function() { //百度云把一些内容放到后面加载,因此我设置了一个延时循环，每隔100ms选择一下所需的元素，当所需的元素存在时，开始脚本，同时停止延时循环
-                    if ($(replaceEle).length > 0) {
-                        window.clearInterval(t);
-                        flag = option;
-                        setUI();
-                        bind();
-                    }
-                    console.log('waiting');
-                }, 100);
-        },
+        }
+        data.cursor.resultCount = parseInt( data.cursor.resultCount.toString(),10);
+        data.cursor.estimatedResultCount = data.cursor.resultCount;
+        return data;        
     };
-};
+    bdModel.toJson.google=function(responseText){
+        var data=JSON.parse(responseText);
+        return data;        
+    };
 
-//根据屏幕分辨率选择替换的元素
-var ele = (window.innerWidth > 1024 ? '#ad-header-tips' : 'div.remaining');
+    bdModel.compileUrl.bing=function(_self){
+        return _self.urls.bing + _self.keyword + '+site%3Apan.baidu.com' + '&first=' + (_self.curr-1)*10;
+    };
+    bdModel.compileUrl.google=function(_self){
+        return _self.urls.google + _self.keyword + '&start=' + (_self.curr-1)*10;
+    };
 
-//启动
-SearchObject(jQuery, ele).init('Bing'); //to use original google, please replace parameter with 'Google';
+    var bdView=new Viewer(bdModel,{
+        inputEle:$('#wxz_input'),
+        searchBtn:$('#wxz_searchButton'),
+        closeBtn:$('#wxz_closeButton'),
+        myDiv:$('#wxz_myDiv'),
+        myContent:$('.wxz-content'),
+        menu:$('#wxzMenuDisplay'),
+        engineBtn:$('.wxz-menu-option'),
+        engineLst:$('#wxz_engineLst'),
+        pagese:$('#wxz-pagese'),
+        toPageBtn:$('.page-number'),
+    });
+    var bdController=new Controller(bdModel,bdView);
+    bdController.refleshEngineLst();
+    bdController.setEngine('bing');
+ }
+
+    var
+    t = window.setInterval(function() { //百度云把一些内容放到后面加载,因此我设置了一个延时循环，每隔100ms选择一下所需的元素，当所需的元素存在时，开始脚本，同时停止延时循环
+        if ($("#ad-header-tips").length > 0) {
+            window.clearInterval(t);
+            initial();
+        }
+        console.log('waiting');
+    }, 100);
