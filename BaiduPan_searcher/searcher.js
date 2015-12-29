@@ -483,7 +483,7 @@ var TemplateEngine = function(html, options) {
     };
     bdModel.toJson.google=function(responseText){
         var data=JSON.parse(responseText);
-        data.cursor.resultCount=parseInt(data.cursor.resultCount.split(',').join());
+        data.cursor.resultCount=parseInt(data.cursor.resultCount.split(',').join(''));
         return data;        
     };
 
