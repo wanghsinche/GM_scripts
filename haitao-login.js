@@ -19,32 +19,91 @@ var accountlst=[
     {username:'2271177214@qq.com',password:'ilovechina..',oname:'卢香香'},
 ];
 
-var FetchList=function(start,end){
-	this.loginTime=0;
-	this.start=start;
-	this.end=end;
-	this.accountindicator=0;
-};
 
-FetchList.prototype.fetch=function(start,end,callback){
-	var baseURL="http://buyers.youdao.com/order/myorders?";
-	callback.call(this);
-};
 
-FetchList.prototype.login=function(username,password){
-	if(loginTime>3){
-		return;
+//Event is a simple class for implementing the Observer pattern:
+function Event(sender) {
+    this._sender = sender;
+    this._listeners = [];
+}
+
+Event.prototype = {
+    attach : function (listener) {//push the callback function into _listeners[];
+        this._listeners.push(listener);
+    },
+    notify : function (args) {//pop all the callback functions and execute the functions with same args?
+        var index;
+
+        for (index = 0; index < this._listeners.length; index += 1) {
+            this._listeners[index](this._sender, args);//auto pass sender and args into callback function, so the default form of callback function is function(sender,args){}
+        }
+    }
+};
+var account_i=6;
+var allMap=new Map();
+var globalLoginDoneEvent=new Event();
+globalLoginDoneEvent.attach(function(sender,msg){
+	fetchList(msg,1);
+});
+var globalFetchDoneEvent=new Event();
+globalFetchDoneEvent.attach(function(){
+	account_i--;
+	if(account_i>=0){
+		fetchLogin(account_i);		
+	}else{
+		globalCrawlAllEvent.notify();
 	}
+});
+var globalCrawlAllEvent=new Event();
+globalCrawlAllEvent.attach(function(){
+	//something later;
+});
+
+
+var fetchList=function(username,page){
+	var baseURL="http://buyers.youdao.com/order/myorders?page=";
+		GM_xmlhttpRequest({
+			method:"GET",
+			url:baseURL+page.toString(),
+			onload:function(response){
+				var orderMap=compileTOdata(username,response.responseText);
+				if(orderMap.size<1){
+					globalFetchDoneEvent.notify();
+				}else{
+					orderMap.forEach(function(value, key){
+						allMap.set(key,value);
+					});
+					page++;
+					fetchList(username,page);
+				}
+			}			
+		});		
+
+};
+//@return {order:{username,id},order:{username,id}}
+var compileTOdata=function(username,htmlText){
+	var htmlel=$(htmlText);
+	var orderMap=new Map();
+	var orderKey,orderID;
+	$('.all-list-tbody>tr',htmlel).each(function(index,val){
+		var valel=$(val);
+		var orderKey=$('td',valel).eq(1).attr('title');
+		var orderID=$('td',valel).eq(1).text();
+		orderMap.set(orderKey,{username:username,id:orderID});
+	});
+	return orderMap;
+};
+
+var fetchLogin=function(i){
+	var loginEvent= new Event(this);	
 	var loginURL='https://buyers.youdao.com/auth/login';
-	var text=["username="+encodeURIComponent(username),"password="+encodeURIComponent(password)];
+	var text=["username="+encodeURIComponent(accountlst[i].username),"password="+encodeURIComponent(accountlst[i].password)];
 	var senddata=text.join('&');
-	this.loginTime++;
-	this.accountindicator++;
 	var _this=this;
-	var temp={username:username,password:password};
+	var tempuser=accountlst[i].username;
 	GM_xmlhttpRequest({
 		method:"POST",
-		url:'loginURL',
+		url:loginURL,
 		headers: {
 		    "User-Agent": "Mozilla/5.0", // If not specified, navigator.userAgent will be used.
 			'Content-Type': 'application/x-www-form-urlencoded'
@@ -52,19 +111,22 @@ FetchList.prototype.login=function(username,password){
 		data:senddata,
 		onload:function(response){
 			if (response.finalUrl==="http://buyers.youdao.com/list") {
-				_this.fetch(_this.start,_this.end,_this.login(accountlst[_this.accountindicator].username,accountlst[_this.accountindicator].password));
+				globalLoginDoneEvent.notify(tempuser);
 			}else{
-				_this.login(temp.username,temp.password);
+				globalFetchDoneEvent.notify();//skip and next account
+				console.log("username :" + tempuser+'login failed');
+				return false;
 			}
 		},
 		onerror:function(response){
-				_this.login(temp.username,temp.password);
+				globalFetchDoneEvent.notify();//skip and next account
+				console.log("username :" + tempuser+'login failed');
+				return false;
 		}
 	});	
 };
 
-var myfetch=new FetchList(0,1);
-myfetch.loginlogin(accountlst[this.accountindicator].username,accountlst[this.accountindicator].password);
+fetchLogin(account_i);
 
 var AccountClass=function(username,password,user){
 	var text=["username="+encodeURIComponent(username),"password="+encodeURIComponent(password)];
