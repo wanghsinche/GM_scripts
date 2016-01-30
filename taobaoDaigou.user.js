@@ -46,7 +46,7 @@ var afterLoaded=function(response){
 			//已知类型
 			if (response.responseText.match(hasPostedParttern)===null) {
 				//可以提交
-				GM_openInTab(response.finalUrl, true);
+				GM_openInTab(response.finalUrl,false);
 			}else{
 				//已经提交
 				alert('已经提交');
