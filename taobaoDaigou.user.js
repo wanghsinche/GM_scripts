@@ -4,12 +4,13 @@
 // @description  淘宝代购,保留一切版权。
 // @author       Wanghsinche 
 // @include      http://www.amazon.co.uk/*
+// @include      http://www.amazon.co.jp/*
+// @include      http://www.amazon.com/*
 // @include      http://daigou.taobao.com
 // @require http://libs.useso.com/js/jquery/1.9.0/jquery.min.js
 // @grant       GM_xmlhttpRequest
-// @grant       GM_setValue
-// @grant       GM_getValue
-
+// @grant       GM_openInTab
+// @run-at document-body
 
 // ==/UserScript==
 //Event is a simple class for implementing the Observer pattern:
@@ -64,17 +65,23 @@ var afterLoaded=function(response){
 
 };
 //////////////////////////////////
-var parseHtml=function(response){
-	var $html=$(response.responseText);
-
+var getURL=function(){
+	var url=location.href;
+	var host=location.host;//url.match(/http:\/\/[\w|\.]*/);
+	var code=url.match(/B00\w{7}/);
+	var suburl='';
+	suburl='http://'+host+'/dp/'+code;
+	return suburl;
 };
 //////////////////////////////////
 var fetchLogin=function(i){
-	var loginEvent= new Event(this);	
+	var loginEvent= new Event(this);
 	var loginURL='http://daigou.taobao.com/buyer/index.htm';
-	var text=["action="+encodeURIComponent('/buyer/submit_url_action'),"event_submit_do_submit_url="+encodeURIComponent('anything'),"_tb_token_="+encodeURIComponent('LUHLJE8DqGtdw64'),"itemUrl="+encodeURIComponent('http://www.amazon.com/dp/B00WBK03OU')];
+	var suburl=getURL();
+	var text=["action="+encodeURIComponent('/buyer/submit_url_action'),"event_submit_do_submit_url="+encodeURIComponent('anything'),"_tb_token_="+encodeURIComponent('LUHLJE8DqGtdw64'),"itemUrl="+encodeURIComponent(suburl)];
 	var senddata=text.join('&');
 	var _this=this;
+	console.log(suburl);
 	GM_xmlhttpRequest({
 		method:"POST",
 		url:loginURL,
