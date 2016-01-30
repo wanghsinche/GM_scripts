@@ -32,6 +32,77 @@ Event.prototype = {
     }
 };
 //////////////////////////////////
+//page router settings
+		var route={
+			defaultRoute:'',
+			currentHash:'',
+			routeLst:[
+		    	{hash:'#1', vc:function(appModel){
+		    		requirejs(['app/selectApp/vcForView1'],function(app){
+						var appViewer=new app.Viewer(appModel,{
+							selectItemClass:'.item',
+							templateID:'t:view_select',
+							viewID:'#view_select',
+						});
+						var appController=new app.Controller(appModel,appViewer);
+						appController.initial();
+		   			});
+		    	}},
+		    	{hash:'#2', vc:function(appModel){
+		    		requirejs(['app/selectApp/vcForView2'],function(app){
+						var appViewer=new app.Viewer(appModel,{
+							selectItemClass:'.problem-item',
+							templateID:'t:view_problem',
+							viewID:'#view_select',
+							textAreaID:'#textPro',
+						});
+						var appController=new app.Controller(appModel,appViewer);
+						appController.initial();
+		   			});
+		    	}},
+		    	{hash:'#4', vc:function(appModel){
+		    		requirejs(['app/selectApp/vcForView4'],function(app){
+						var appViewer=new app.Viewer(appModel,{
+							selectItemClass:'.serve-item',
+							templateID:'t:view_serve',
+							viewID:'#view_select',
+						});
+						var appController=new app.Controller(appModel,appViewer);
+						appController.initial();
+		   			});
+		    	}},		    	
+	    	],
+	    	hashCheck:function(model){
+		        if (window.location.hash != this.currentHash){
+		        	for(var i=0,currentRoute;i<this.routeLst.length;i++){
+		            	currentRoute = this.routeLst[i];
+		                if (window.location.hash == currentRoute.hash){
+		            		this.currentHash = window.location.hash;                   
+		                    currentRoute.vc(model);
+		                    this.refleshView(model);
+		                	break;
+		                }
+		        	}
+		        }
+		    },
+			refleshView:function(model){
+				var self=this;
+        		$('.process-item').removeClass('active');
+        		$.each($('.process-item>a'),function(index,val){
+        			$(val).parent().addClass('active');
+        			if($(val).attr('href').toString()===self.currentHash)
+        				return false;
+        		});
+		    },
+		    startRoute:function(defaultRoute,model){
+		        window.location.hash = window.location.hash || defaultRoute;
+		        this.defaultRoute=defaultRoute;
+		        this.currentHash="";
+		        var self=this;
+		        setInterval(function(){self.hashCheck(model);}, 200);
+  		    },		    
+		};
+//////////////////////////////////
 var afterLoaded=function(response){
 	var existParttern="商品已经存在";
 	var successParttern="itemPublish.htm";
@@ -49,7 +120,7 @@ var afterLoaded=function(response){
 				GM_openInTab(response.finalUrl,false);
 			}else{
 				//已经提交
-				alert('已经提交');
+				alert(hasPostedParttern);
 							// console.log('2');
 
 			}
