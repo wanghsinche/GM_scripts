@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         taobaoDaigou
-// @version      0.1
+// @version      0.1.1
 // @description  淘宝代购,保留一切版权。
 // @author       Wanghsinche 
 // @include      http://www.amazon.co.uk/*
@@ -40,8 +40,8 @@ var afterLoaded=function(response){
 		//商品不存在，继续
 		if (response.finalUrl.match(successParttern)===null){
 			//未知类型，退出
-			// alert('未知类型');
-			console.log('1');
+			alert('未知类型');
+			// console.log('1');
 		}else{
 			//已知类型
 			if (response.responseText.match(hasPostedParttern)===null) {
@@ -49,8 +49,8 @@ var afterLoaded=function(response){
 				GM_openInTab(response.finalUrl, true);
 			}else{
 				//已经提交
-				// alert(hasPostedParttern);
-							console.log('2');
+				alert('已经提交');
+							// console.log('2');
 
 			}
 			
@@ -58,8 +58,8 @@ var afterLoaded=function(response){
 	}
 	else{
 		//商品存在
-		// alert(existParttern);
-					console.log('3');
+		alert(existParttern);
+					// console.log('3');
 
 	}
 
