@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         taobaoDaigou
-// @version      0.1.4
+// @version      0.1.5
 // @description  淘宝代购,保留一切版权。
 // @author       Wanghsinche 
 // @include      http://www.amazon.co.uk/*
@@ -67,17 +67,17 @@ var afterLoaded=function(response){
 		}else{
 			//已知类型
 			if (response.responseText.match(hasPostedParttern)===null) {
-				alert('可以提交');
+				shouMessage('可以提交');
 				// GM_openInTab(response.finalUrl,true);
 			}else{
 				//已经提交
-				alert('已经提交');
+				shouMessage('已经提交');
 			}
 		}
 	}
 	else{
 		//商品存在
-		alert(existParttern);
+		shouMessage(existParttern);
 	}
 
 };
@@ -120,14 +120,11 @@ var fetchLogin=function(token){
 };
 
 ////////////////////
-
-// $('#productTitle').append('<button id="wxzBtn" class="">check</button>');
-// $('#wxzBtn').click(function(){
-// 	getToken();
-// });
+///////////////////
+var shouMessage=function (message) {
+	var spanEle=document.getElementById("wxzSpan");
+	spanEle.innerHTML=message;
+}
 var titleEle=document.getElementById("productTitle");
-titleEle.innerHTML=titleEle.innerHTML+'<button id="wxzBtn" class="">check</button>';
-document.getElementById("productTitle").addEventListener('click',function () {
-	// body...
-	getToken();
-});
+titleEle.innerHTML=titleEle.innerHTML+'<span id="wxzSpan" class=""></span>';
+getToken();
