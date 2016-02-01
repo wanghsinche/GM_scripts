@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         taobaoDaigou
-// @version      0.1.2
+// @version      0.1.3
 // @description  淘宝代购,保留一切版权。
 // @author       Wanghsinche 
 // @include      http://www.amazon.co.uk/*
@@ -32,87 +32,39 @@ Event.prototype = {
     }
 };
 //////////////////////////////////
-//page router settings
-var route={
-	defaultRoute:'',
-	currentHash:'',
-	routeLst:[
-    	{hash:'#1', vc:function(appModel){
-    		requirejs(['app/selectApp/vcForView1'],function(app){
-				var appViewer=new app.Viewer(appModel,{
-					selectItemClass:'.item',
-					templateID:'t:view_select',
-					viewID:'#view_select',
-				});
-				var appController=new app.Controller(appModel,appViewer);
-				appController.initial();
-   			});
-    	}},
-    	{hash:'#2', vc:function(appModel){
-    		requirejs(['app/selectApp/vcForView2'],function(app){
-				var appViewer=new app.Viewer(appModel,{
-					selectItemClass:'.problem-item',
-					templateID:'t:view_problem',
-					viewID:'#view_select',
-					textAreaID:'#textPro',
-				});
-				var appController=new app.Controller(appModel,appViewer);
-				appController.initial();
-   			});
-    	}},
-    	{hash:'#4', vc:function(appModel){
-    		requirejs(['app/selectApp/vcForView4'],function(app){
-				var appViewer=new app.Viewer(appModel,{
-					selectItemClass:'.serve-item',
-					templateID:'t:view_serve',
-					viewID:'#view_select',
-				});
-				var appController=new app.Controller(appModel,appViewer);
-				appController.initial();
-   			});
-    	}},		    	
-	],
-	hashCheck:function(model){
-        if (window.location.hash != this.currentHash){
-        	for(var i=0,currentRoute;i<this.routeLst.length;i++){
-            	currentRoute = this.routeLst[i];
-                if (window.location.hash == currentRoute.hash){
-            		this.currentHash = window.location.hash;                   
-                    currentRoute.vc(model);
-                    this.refleshView(model);
-                	break;
-                }
-        	}
-        }
-    },
-	refleshView:function(model){
-		var self=this;
-		$('.process-item').removeClass('active');
-		$.each($('.process-item>a'),function(index,val){
-			$(val).parent().addClass('active');
-			if($(val).attr('href').toString()===self.currentHash)
-				return false;
-		});
-    },
-    startRoute:function(defaultRoute,model){
-        window.location.hash = window.location.hash || defaultRoute;
-        this.defaultRoute=defaultRoute;
-        this.currentHash="";
-        var self=this;
-        setInterval(function(){self.hashCheck(model);}, 200);
-	    },		    
+var getToken=function () {
+	GM_xmlhttpRequest({
+		method:"GET",
+		url:"http://daigou.taobao.com/buyer/index.htm",
+		headers: {
+		    "User-Agent": "Mozilla/5.0", // If not specified, navigator.userAgent will be used.
+			'Content-Type': 'text/html'
+		},
+		onload:function(response){
+			var matchArray=response.responseText.match(/data-token="(\w*)"/);
+			if (matchArray===null||matchArray.length<2) {
+				alert('get token failed');
+			} else{
+				fetchLogin(matchArray[1]);
+			}
+		},
+		onerror:function(response){
+				alert('未知错误');
+		}
+	});		
 };
+//////////////////////////////////
 //////////////////////////////////
 var afterLoaded=function(response){
 	var existParttern="商品已经存在";
 	var successParttern="itemPublish.htm";
 	var hasPostedParttern="已经存在该商品";
-	if (response.finalUrl.match(existParttern)===null) {
+	var decodedUrl=decodeURIComponent(response.finalUrl);
+	if (decodedUrl.match(existParttern)===null) {
 		//商品不存在，继续
-		if (response.finalUrl.match(successParttern)===null){
+		if (decodedUrl.match(successParttern)===null){
 			//未知类型，退出
-			alert('未知类型');
-			// console.log('1');
+			alert(decodedUrl);
 		}else{
 			//已知类型
 			if (response.responseText.match(hasPostedParttern)===null) {
@@ -121,17 +73,12 @@ var afterLoaded=function(response){
 			}else{
 				//已经提交
 				alert(hasPostedParttern);
-							// console.log('2');
-
 			}
-			
 		}
 	}
 	else{
 		//商品存在
 		alert(existParttern);
-					// console.log('3');
-
 	}
 
 };
@@ -145,11 +92,11 @@ var getURL=function(){
 	return suburl;
 };
 //////////////////////////////////
-var fetchLogin=function(i){
+var fetchLogin=function(token){
 	var loginEvent= new Event(this);
 	var loginURL='http://daigou.taobao.com/buyer/index.htm';
 	var suburl=getURL();
-	var text=["action="+encodeURIComponent('/buyer/submit_url_action'),"event_submit_do_submit_url="+encodeURIComponent('anything'),"_tb_token_="+encodeURIComponent('LUHLJE8DqGtdw64'),"itemUrl="+encodeURIComponent(suburl)];
+	var text=["action="+encodeURIComponent('/buyer/submit_url_action'),"event_submit_do_submit_url="+encodeURIComponent('anything'),"_tb_token_="+encodeURIComponent(token),"itemUrl="+encodeURIComponent(suburl)];
 	var senddata=text.join('&');
 	var _this=this;
 	console.log(suburl);
@@ -174,7 +121,14 @@ var fetchLogin=function(i){
 };
 
 ////////////////////
-$('#productTitle').append('<button id="wxzBtn" class="">check</button>');
-$('#wxzBtn').click(function(){
-	fetchLogin();
+
+// $('#productTitle').append('<button id="wxzBtn" class="">check</button>');
+// $('#wxzBtn').click(function(){
+// 	getToken();
+// });
+var titleEle=document.getElementById("productTitle");
+titleEle.innerHTML=titleEle.innerHTML+'<button id="wxzBtn" class="">check</button>';
+document.getElementById("productTitle").addEventListener('click',function () {
+	// body...
+	getToken();
 });
