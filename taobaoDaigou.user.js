@@ -7,7 +7,6 @@
 // @include      http://www.amazon.co.jp/*
 // @include      http://www.amazon.com/*
 // @include      http://daigou.taobao.com
-// @require http://libs.useso.com/js/jquery/1.9.0/jquery.min.js
 // @grant       GM_xmlhttpRequest
 // @grant       GM_openInTab
 // @run-at document-body
