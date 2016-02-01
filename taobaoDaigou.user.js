@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         taobaoDaigou
-// @version      0.1.5
+// @version      0.1.7
 // @description  淘宝代购,保留一切版权。
 // @author       Wanghsinche 
 // @include      http://www.amazon.co.uk/*
@@ -9,6 +9,9 @@
 // @include      http://daigou.taobao.com
 // @grant       GM_xmlhttpRequest
 // @grant       GM_openInTab
+// @grant       GM_getValue
+// @grant       GM_setValue
+// @grant		GM_addStyle
 // @run-at document-body
 
 // ==/UserScript==
@@ -44,7 +47,8 @@ var getToken=function () {
 			if (matchArray===null||matchArray.length<2) {
 				alert('get token failed');
 			} else{
-				fetchLogin(matchArray[1]);
+				var suburl=getURL();
+				fetchLogin(matchArray[1],suburl);
 			}
 		},
 		onerror:function(response){
@@ -91,10 +95,9 @@ var getURL=function(){
 	return suburl;
 };
 //////////////////////////////////
-var fetchLogin=function(token){
+var fetchLogin=function(token,suburl){
 	var loginEvent= new Event(this);
 	var loginURL='http://daigou.taobao.com/buyer/index.htm';
-	var suburl=getURL();
 	var text=["action="+encodeURIComponent('/buyer/submit_url_action'),"event_submit_do_submit_url="+encodeURIComponent('anything'),"_tb_token_="+encodeURIComponent(token),"itemUrl="+encodeURIComponent(suburl)];
 	var senddata=text.join('&');
 	var _this=this;
@@ -126,5 +129,63 @@ var shouMessage=function (message) {
 	spanEle.innerHTML=message;
 }
 var titleEle=document.getElementById("productTitle");
-titleEle.innerHTML=titleEle.innerHTML+'<span id="wxzSpan" class=""></span>';
-getToken();
+titleEle.innerHTML=titleEle.innerHTML+'<span id="wxzSpan" style="color:blue" class=""></span><div class="onoffswitch"><input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" ><label class="onoffswitch-label" for="myonoffswitch"></label></div>';
+
+GM_addStyle('.onoffswitch {\
+    position: relative; width: 51px;\
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;\
+}\
+.onoffswitch-checkbox {\
+    display: none;\
+}\
+.onoffswitch-label {\
+    display: block; overflow: hidden; cursor: pointer;\
+    height: 24px; padding: 0; line-height: 24px;\
+    border: 2px solid #CCCCCC; border-radius: 24px;\
+    background-color: #FFFFFF;\
+    transition: background-color 0.3s ease-in;\
+}\
+.onoffswitch-label:before {\
+    content: "";\
+    display: block; width: 24px; margin: 0px;\
+    background: #FFFFFF;\
+    position: absolute; top: 0; bottom: 0;\
+    right: 25px;\
+    border: 2px solid #CCCCCC; border-radius: 24px;\
+    transition: all 0.3s ease-in 0s; \
+}\
+.onoffswitch-checkbox:checked + .onoffswitch-label {\
+    background-color: #49E845;\
+}\
+.onoffswitch-checkbox:checked + .onoffswitch-label, .onoffswitch-checkbox:checked + .onoffswitch-label:before {\
+   border-color: #49E845;\
+}\
+.onoffswitch-checkbox:checked + .onoffswitch-label:before {\
+    right: 0px; \
+}');
+
+document.getElementById("myonoffswitch").addEventListener('click',function(){
+	var flag=GM_getValue('daigou-open')===undefined?false:GM_getValue('daigou-open');	
+	flag=!flag;
+	GM_setValue('daigou-open',flag);
+	checkFlag();
+});
+
+var checkFlag=function () {
+	// body...
+	var flag=GM_getValue('daigou-open')===undefined?false:GM_getValue('daigou-open');
+	if (GM_getValue('daigou-open')===undefined) {
+		GM_setValue('daigou-open',false);
+		flag=false;
+	}else{
+		flag=GM_getValue('daigou-open');
+	}	
+	if(flag===true){
+		document.getElementById("myonoffswitch").checked=true;	
+		getToken();	
+	}else{
+		document.getElementById("myonoffswitch").checked=false;			
+	}
+}
+
+checkFlag();
