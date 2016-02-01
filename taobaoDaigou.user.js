@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         taobaoDaigou
-// @version      0.1.3
+// @version      0.1.4
 // @description  淘宝代购,保留一切版权。
 // @author       Wanghsinche 
 // @include      http://www.amazon.co.uk/*
@@ -67,11 +67,11 @@ var afterLoaded=function(response){
 		}else{
 			//已知类型
 			if (response.responseText.match(hasPostedParttern)===null) {
-				//可以提交
-				GM_openInTab(response.finalUrl,false);
+				alert('可以提交');
+				// GM_openInTab(response.finalUrl,true);
 			}else{
 				//已经提交
-				alert(hasPostedParttern);
+				alert('已经提交');
 			}
 		}
 	}
