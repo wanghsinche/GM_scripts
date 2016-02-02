@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         taobaoDaigou
-// @version      0.1.9
+// @version      1.0
 // @description  淘宝代购,保留一切版权。
 // @author       Wanghsinche 
 // @include      http://www.amazon.*
@@ -199,14 +199,19 @@ var titleEle=document.getElementById("productTitle");
 titleEle.innerHTML=titleEle.innerHTML+'<span id="wxzSpan"  class=""></span><div class="onoffswitch"><input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" ><label class="onoffswitch-label" for="myonoffswitch"></label></div>';
 
 GM_addStyle('\
-	#wxzSpan{\
+#wxzSpan{\
 	display:none;\
 	color:white;\
 	background-color:grey;\
 	border-radius:5px;\
 	border:2px solid #c3c3c3;\
 }\
+#wxzSpan a{\
+ color:white;\
+}\
 .onoffswitch {\
+	display:inline-block;\
+	vertical-align:middle;\
     position: relative; width: 51px;\
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;\
 }\
