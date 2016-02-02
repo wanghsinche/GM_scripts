@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         taobaoDaigou
-// @version      1.0
+// @version      1.1
 // @description  淘宝代购,保留一切版权。
 // @author       Wanghsinche 
 // @include      http://www.amazon.*
@@ -57,7 +57,7 @@ subStepEvent.attach(function (sender,agr) {
 			shouMessage('已经提交');
 			break;
 			case 4:
-			shouMessage('<a href="'+agr.response.finalUrl+'">可以提交</a>');
+			shouMessage('<a href="'+agr.response.finalUrl+' " target="_blank">可以提交</a>');
 			break;
 			default:
 			shouMessage('商品已经存在');
@@ -196,7 +196,7 @@ var shouMessage=function (message) {
 	spanEle.style.display='inline';
 }
 var titleEle=document.getElementById("productTitle");
-titleEle.innerHTML=titleEle.innerHTML+'<span id="wxzSpan"  class=""></span><div class="onoffswitch"><input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" ><label class="onoffswitch-label" for="myonoffswitch"></label></div>';
+titleEle.innerHTML=titleEle.innerHTML+'&nbsp;&nbsp;<div class="onoffswitch"><input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" ><label class="onoffswitch-label" for="myonoffswitch"></label></div>&nbsp;&nbsp;<span id="wxzSpan"  class=""></span>';
 
 GM_addStyle('\
 #wxzSpan{\
