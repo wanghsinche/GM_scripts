@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         haitao
-// @version      0.2.2
+// @version      0.2.3
 // @description  惠惠海淘自动脚本，使用时打开脚本就行，自动运行的。抢到单就自动停止，否则会一直抢。保留一切版权。
 // @author       Wanghsinche 
 // @include      http://buyers.youdao.com/list*
@@ -141,7 +141,7 @@ function judgeSuccess() {
 		console.log('judgeSuccess success');
 		$('label').trigger('click');
 		$('body').prepend("<div id='alart' style='height:300px;text-align:center;background: yellow;'>好了</div>");
-		//$('body').append('<iframe src="http://wxztest.sinaapp.com/tile-dharu-bola-13820.mp3" frameborder="0" id="alertIframe"></iframe>');
+		$('body').prepend('<embed type="application/x-mplayer2" loop="true" src="https://kyfw.12306.cn/otn/resources/js/framework/audio/message.wav" id="player" autostart="true" uiMode="none" hidden="true"></embed>');
 	} else {
 		setTimeout(function() {
 			judgeSuccess();
