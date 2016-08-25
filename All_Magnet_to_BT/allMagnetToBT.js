@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         All Magnet to BT
-// @version      0.1.4.3
+// @version      0.1.4.4
 // @description  找出页面的磁力链，给出对应的种子下载地址//Find out all magnet links in current page and get their torrent download URLs. In theory, it supports many sites. you can add your favorites by //@include 
 // @author       wanghsinche @ 201509
 // @include      https://btdigg.org/search*
@@ -16,7 +16,7 @@
 function getAllMagnet(rawMagnets) {
 	var magnetNum = rawMagnets.length;
 	var rawString = "";
-	var rex = new RegExp("\\w{40}", 'g'); //regular expression to match all 40 bit code 
+	var rex = new RegExp("\\w{40}", 'g'); //regular expression to match all 40 bit code
 	if (magnetNum !== 0) { //prase all magnet herf nodes into string
 		for (var i = 0; i < magnetNum; i++) {
 			rawString += rawMagnets[i].toString();
@@ -45,7 +45,7 @@ function code2down2(str) {
 function code2down3(str) {
 	var btih, torrentURL;
 	btih = str.toLocaleUpperCase();
-	torrentURL = "http://www.torrent.org.cn/Home/Torrent/download.html?hash=" + btih;
+	torrentURL = "http://www.torrent.org.cn/Home/torrent/download.html?hash=" + btih;
 	return torrentURL;
 }
 
@@ -54,7 +54,7 @@ function include(Things,obj) {
 		if ($(Things[i]).attr('href')===$(obj).attr('href')){
 			return true;
 		}
-	};
+	}
 }
 
 function setCss(){
@@ -70,16 +70,16 @@ function getAllTorrentsNew() {
 		if(!include(nodes,rawnodes[i])){
 			nodes.push(rawnodes[i]);
 		}
-	};
+	}
 	codeList = getAllMagnet(nodes);
 	listLen = codeList.length;
     setCss();
-   
+
 	if (listLen !== 0) { //prase all magnet herf nodes into string
-		for (var i = 0; i < listLen; i++) {
+		for ( i = 0; i < listLen; i++) {
             $(nodes[i]).after($(nodes[i]).clone().addClass('wxz-a color3').empty().attr("target","_blank").attr("title","download torrent from torrent.org" ).attr("href", code2down3(codeList[i])));
-			$(nodes[i]).after($(nodes[i]).clone().addClass('wxz-a color1').empty().attr("target","_blank").attr("title","download torrent from bt.box" ).attr("href", code2down1(codeList[i])));
-			$(nodes[i]).after($(nodes[i]).clone().addClass('wxz-a color2').empty().attr("target","_blank").attr("title","download torrent from torcache" ).attr("href", code2down2(codeList[i])));
+			//$(nodes[i]).after($(nodes[i]).clone().addClass('wxz-a color1').empty().attr("target","_blank").attr("title","download torrent from bt.box" ).attr("href", code2down1(codeList[i])));
+			//$(nodes[i]).after($(nodes[i]).clone().addClass('wxz-a color2').empty().attr("target","_blank").attr("title","download torrent from torcache" ).attr("href", code2down2(codeList[i])));
 		}
 	}
      $('.wxz-a').css('b','d');
@@ -100,7 +100,7 @@ function getAllTorrents() {
 	}
 }
 
-var i=0
+var i=0;
 
 
 var t=window.setInterval(function() { //wait 2 seconds to execute getAllTorrents() function
