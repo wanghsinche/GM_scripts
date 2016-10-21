@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       百度云插件+APIKey
 // @namespace  
-// @version    5.0
+// @version    5.0.1
 // @description  在百度云网盘的页面添加一个搜索框，调用搜索API搜索所有公开分享文件// To add a search frame that calls some api for searching some public shared files in BaiduYun cloud netdisk. 
 // @description  For more imformation,please email me at wanghsinche@hotmail.com. 
 // @include       /https?\:\/\/pan\.baidu\.com.*/
@@ -197,7 +197,7 @@ var TemplateEngine = function(html, options) {
         this.UI.myDiv.style.display = 'block';
         this.UI.bgNode.style.display = 'block';
         this.UI.myDiv.style.top = '50%';
-        this.UI.myDiv.style['margin-top'] = (this.UI.myDiv.clientHeight / 2 * -1) + 'px';    
+        this.UI.myDiv.style.marginTop = (this.UI.myDiv.clientHeight / 2 * -1) + 'px';    
     },
     reflesh:function(success){
         var template="<p align='right'>---- by <%this.engine%>.com Search </p><p white-space='normal' class='temp' >keyword is    '<%this.keyword%>'    found  '<%this.jsonObj.cursor.resultCount%>'  Results</p><p>--------------------------------------------------<p>";
@@ -350,7 +350,7 @@ function newInit () {
     wxzDialogNode.setAttribute('style','z-index:99;postion:absolute;');
     wxzDialogNode.style.width = window.innerWidth / 3 * 2 + 'px';
     wxzDialogNode.style.left = '50%';    
-    wxzDialogNode.style['margin-left'] = (-1 * window.innerWidth / 3) + 'px'; 
+    wxzDialogNode.style.marginLeft = (-1 * window.innerWidth / 3) + 'px'; 
     wxzDialogNode.innerHTML = 
         '\
             <div class="dialog-header" id="wxz_myDiv_title">\
@@ -379,7 +379,7 @@ function newInit () {
     .wxz-menu{cursor:pointer; height:100%; display:inline-block; vertical-align:middle;position:relative;}\
     .wxz-menu:hover .wxz-menu-content{display:block; z-index:99}\
     .wxz-menu:hover .icon-dropdown-arrow{transform:rotate(180);}\
-    .wxz-menu-option{text-align:center;line-height:30px;cursor:pointer;background:white;border:1px solid #eff4f8;border-collapse: collapse;}\
+    .wxz-menu-option{text-align:center;line-height:30px;cursor:pointer;background:white;color:black;border:1px solid #eff4f8;border-collapse: collapse;}\
     #wxz_searchForm{display:inline-block; vertical-align:middle;}\
     #wxz_input{padding:0 4px; border: 1px solid #c0d9fe;border-radius: 4px;line-height: 22px;}\
     #wxz_searchButton{cursor:pointer; background: #3b8cff;border: 2px solid #3b8cff;color: #f8fbff;border-radius: 6px;}\
