@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       百度云插件+APIKey
 // @namespace  
-// @version    5.0.1
+// @version    5.0.2
 // @description  在百度云网盘的页面添加一个搜索框，调用搜索API搜索所有公开分享文件// To add a search frame that calls some api for searching some public shared files in BaiduYun cloud netdisk. 
 // @description  For more imformation,please email me at wanghsinche@hotmail.com. 
 // @include       /https?\:\/\/pan\.baidu\.com.*/
@@ -75,7 +75,11 @@ var TemplateEngine = function(html, options) {
  };
  BaseModel.prototype={
     setEngine:function(engine){
+    	var tempObj = {};
         this.engine=engine;
+        tempObj['engine'] = engine;
+        window.localStorage.setItem('wxzYunpanSearcher',JSON.stringify(tempObj));
+        tempObj = null;
     },
     updateCurr:function(curr){
         this.curr=curr;
@@ -319,11 +323,13 @@ var TemplateEngine = function(html, options) {
 function newInit () {
     //remove advs
     //create search bar
-    document.querySelector('.header-union').remove();
+    if(document.querySelector('.header-union')){
+        document.querySelector('.header-union').remove();
+    }
     var targetNode = document.querySelector('.header-info');
     var wxzSearchBarNode = document.createElement('dd');
     wxzSearchBarNode.setAttribute('class','header-wxzbar header-info');
-    wxzSearchBarNode.setAttribute('node-type','header-apps');
+    //wxzSearchBarNode.setAttribute('node-type','header-apps');
     wxzSearchBarNode.innerHTML =
             '<span class="wxz-menu wxz-dropdown">\
                 <span class="user-name" id="wxzMenuDisplay">google</span>\
@@ -472,16 +478,37 @@ function newInit () {
     });
     var bdController=new Controller(bdModel,bdView);
     bdController.refleshEngineLst();
-    bdController.setEngine('bing');
+	//这里写的不好
+    var tempStr = '';
+    var tempObj;
+    tempStr = window.localStorage.getItem('wxzYunpanSearcher');
+    if (tempStr) {
+    	tempObj = JSON.parse(tempStr);
+    	bdController.setEngine(tempObj.engine);
+    }
+    else{
+    	bdController.setEngine('bing');
+    }
+    
 
 }
 
+var counter = 0;
 
 var
-t = window.setInterval(function() { //百度云把一些内容放到后面加载,因此我设置了一个延时循环，每隔200ms选择一下所需的元素，当所需的元素存在时，开始脚本，同时停止延时循环
-    if (document.querySelector(".user-name") !== null) {
+t = window.setInterval(function() { //百度云把一些内容放到后面加载,因此我设置了一个延时循环，每隔200ms选择一下所需的元素，当所需的元素存在时，开始脚本，同时停止延时循环 
+    if (document.querySelector(".header-info") !== null) {
         window.clearInterval(t);
         newInit();
     }
-    console.log('waiting');
+    else{
+        if(counter < 100){
+            console.log('waiting');
+            counter ++;
+        }
+        else{
+            window.clearInterval(t);
+            console.log('out of time');
+        }
+    }
 }, 200);
