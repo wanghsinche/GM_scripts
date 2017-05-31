@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       百度云插件+APIKey
 // @namespace  
-// @version    5.0.2.1
+// @version    5.0.2.3
 // @description  在百度云网盘的页面添加一个搜索框，调用搜索API搜索所有公开分享文件// To add a search frame that calls some api for searching some public shared files in BaiduYun cloud netdisk. 
 // @description  For more imformation,please email me at wanghsinche@hotmail.com. 
 // @include       /https?\:\/\/(pan|yun)\.baidu\.com.*/
