@@ -323,10 +323,10 @@ var TemplateEngine = function(html, options) {
 function newInit () {
     //remove advs
     //create search bar
-    if(document.querySelector('.header-union')){
-        document.querySelector('.header-union').remove();
+    var targetNode = document.querySelector('.find-light-icon').parentNode.parentNode;
+    if (targetNode.parentNode.lastChild.getAttribute("node-type")=="header-union") {
+        targetNode.parentNode.lastChild.remove();
     }
-    var targetNode = document.querySelector('.header-info');
     var wxzSearchBarNode = document.createElement('dd');
     wxzSearchBarNode.setAttribute('class','header-wxzbar header-info');
     //wxzSearchBarNode.setAttribute('node-type','header-apps');
@@ -497,7 +497,7 @@ var counter = 0;
 
 var
 t = window.setInterval(function() { //百度云把一些内容放到后面加载,因此我设置了一个延时循环，每隔200ms选择一下所需的元素，当所需的元素存在时，开始脚本，同时停止延时循环 
-    if (document.querySelector(".header-info") !== null) {
+    if (document.querySelector(".find-light-icon") !== null) {
         window.clearInterval(t);
         newInit();
     }
