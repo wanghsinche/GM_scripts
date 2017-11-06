@@ -406,8 +406,8 @@ function newInit () {
     var bdModel=new BaseModel(['bing','google']);
 
     bdModel.urls.bing='http://cn.bing.com/search?q=';
-    bdModel.urls.google='https://www.googleapis.com/customsearch/v1element?key=AIzaSyCVAXiUzRYsML1Pv6RwSG1gunmMikTzQqY&rsz=filtered_cse&num=10&hl=en&prettyPrint=true&source=gcsc&gss=.com&sig=ee93f9aae9c9e9dba5eea831d506e69a&cx=018177143380893153305:yk0qpgydx_e&q=';
-
+    //bdModel.urls.google='https://www.googleapis.com/customsearch/v1element?key=AIzaSyCVAXiUzRYsML1Pv6RwSG1gunmMikTzQqY&rsz=filtered_cse&num=10&hl=en&prettyPrint=true&source=gcsc&gss=.com&sig=ee93f9aae9c9e9dba5eea831d506e69a&cx=018177143380893153305:yk0qpgydx_e&q=';
+    bdModel.urls.google='https://www.googleapis.com/customsearch/v1element?key=AIzaSyCVAXiUzRYsML1Pv6RwSG1gunmMikTzQqY&rsz=filtered_cse&num=10&hl=en&prettyPrint=true&source=gcsc&gss=.com&sig=bb73d6800fca299b36665ebff4d01037&cx=018177143380893153305:yk0qpgydx_e&cse_tok=AHKYotWVmvV1wohA3g8oNFAm_6cK:1495660148313&q=';
     bdModel.toJson.bing=function(html){
         var data = { cursor: { estimatedResultCount: 0, resultCount: 0 }, results: [] };
         //其中一条结果：
