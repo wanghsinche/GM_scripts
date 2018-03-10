@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       百度云插件+APIKey
 // @namespace  
-// @version    5.0.2.3
+// @version    5.0.3
 // @description  在百度云网盘的页面添加一个搜索框，调用搜索API搜索所有公开分享文件// To add a search frame that calls some api for searching some public shared files in BaiduYun cloud netdisk. 
 // @description  For more imformation,please email me at wanghsinche@hotmail.com. 
 // @include       /https?\:\/\/(pan|yun)\.baidu\.com.*/
@@ -405,8 +405,7 @@ function newInit () {
 
     var bdModel=new BaseModel(['bing','google']);
 
-    bdModel.urls.bing='http://cn.bing.com/search?q=';
-    //bdModel.urls.google='https://www.googleapis.com/customsearch/v1element?key=AIzaSyCVAXiUzRYsML1Pv6RwSG1gunmMikTzQqY&rsz=filtered_cse&num=10&hl=en&prettyPrint=true&source=gcsc&gss=.com&sig=ee93f9aae9c9e9dba5eea831d506e69a&cx=018177143380893153305:yk0qpgydx_e&q=';
+    bdModel.urls.bing='https://cn.bing.com/search?q=';
     bdModel.urls.google='https://www.googleapis.com/customsearch/v1element?key=AIzaSyCVAXiUzRYsML1Pv6RwSG1gunmMikTzQqY&rsz=filtered_cse&num=10&hl=en&prettyPrint=true&source=gcsc&gss=.com&sig=bb73d6800fca299b36665ebff4d01037&cx=018177143380893153305:yk0qpgydx_e&cse_tok=AHKYotWVmvV1wohA3g8oNFAm_6cK:1495660148313&q=';
     bdModel.toJson.bing=function(html){
         var data = { cursor: { estimatedResultCount: 0, resultCount: 0 }, results: [] };
@@ -432,8 +431,9 @@ function newInit () {
             tempResult.contentNoFormatting = ele.querySelector('.b_caption p').textContent;
             data.results.push(tempResult);
         });
-        ////处理统计结果
-        var rawResultCount=html.match(/<span.*?sb_count.*?>(.*?)<\/span>/)[1];
+        ////处理统计结果,
+
+        var rawResultCount=(html.match(/"sb_count">([^<]+)/) && html.match(/"sb_count">([^<]+)/)[1]) || '0';
         var matchLst=[];    
         matchLst=rawResultCount.match(/([0-9]{1,3}(,[0-9]{3})+)/g);
         if(matchLst!==null){//匹配100,000,111之类的情况
@@ -446,6 +446,7 @@ function newInit () {
             data.cursor.resultCount=0;
             }
         }
+
         data.cursor.resultCount = parseInt( data.cursor.resultCount.toString(),10);
         data.cursor.estimatedResultCount = data.cursor.resultCount;
         return data;        
@@ -457,6 +458,7 @@ function newInit () {
     };
 
     bdModel.compileUrl.bing=function(_self){
+        //return 'https://cn.bing.com/search?q=lala+site%3Apan.baidu.com&first=10';
         return _self.urls.bing + _self.keyword + '+site%3Apan.baidu.com' + '&first=' + (_self.curr-1)*10;
     };
     bdModel.compileUrl.google=function(_self){
